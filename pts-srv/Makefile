@@ -6,21 +6,22 @@
 CLIENT = vxi11_client
 SERVER = vxi11_server
 
-SOURCES_CLNT.c = 
+SOURCES_CLNT.c = vxi11_clnt_func.c
 SOURCES_CLNT.h = 
-SOURCES_SVC.c = 
+SOURCES_SVC.c = vxi11_svc_func.c
 SOURCES_SVC.h = 
 SOURCES.x = vxi11.x
 
-TARGETS_SVC.c = vxi11_svc.c vxi11_server.c vxi11_xdr.c 
-TARGETS_CLNT.c = vxi11_clnt.c vxi11_client.c vxi11_xdr.c 
-TARGETS = vxi11.h vxi11_xdr.c vxi11_clnt.c vxi11_svc.c vxi11_client.c vxi11_server.c
+TARGETS_SVC.c = vxi11_svc.c vxi11_xdr.c 
+TARGETS_CLNT.c = vxi11_clnt.c vxi11_xdr.c 
+TARGETS = vxi11.h vxi11_xdr.c vxi11_clnt.c vxi11_svc.c 
 
 OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
 OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o) $(TARGETS_SVC.c:%.c=%.o)
 # Compiler flags 
 
-CFLAGS += -g 
+CC ?= arm-linux-gnueabihf-gcc
+CFLAGS += -g -static
 LDLIBS += -lnsl
 RPCGENFLAGS = 
 
@@ -36,10 +37,10 @@ $(OBJECTS_CLNT) : $(SOURCES_CLNT.c) $(SOURCES_CLNT.h) $(TARGETS_CLNT.c)
 $(OBJECTS_SVC) : $(SOURCES_SVC.c) $(SOURCES_SVC.h) $(TARGETS_SVC.c) 
 
 $(CLIENT) : $(OBJECTS_CLNT) 
-	$(LINK.c) -o $(CLIENT) $(OBJECTS_CLNT) $(LDLIBS) 
+	$(CC) -o $(CLIENT) $(OBJECTS_CLNT) $(LDLIBS) 
 
 $(SERVER) : $(OBJECTS_SVC) 
-	$(LINK.c) -o $(SERVER) $(OBJECTS_SVC) $(LDLIBS)
+	$(CC) -o $(SERVER) $(OBJECTS_SVC) $(LDLIBS)
 
  clean:
 	 $(RM) core $(TARGETS) $(OBJECTS_CLNT) $(OBJECTS_SVC) $(CLIENT) $(SERVER)

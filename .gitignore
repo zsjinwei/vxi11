@@ -17,7 +17,8 @@
 *.app
 *.test
 scpi-parse/examples/*/test
-
+pts-srv/vxi11_client
+pts-srv/vxi11_server
 # Backup files
 *~
 scpi-parse/libscpi/obj/
