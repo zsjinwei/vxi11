@@ -1,15 +1,27 @@
-build/
-vxi11.h
-vxi11_cmd
-vxi11_clnt.c
-vxi11_svc.c
-vxi11_xdr.c
-TAGS
-vxi11_test.cc
-vxi11_test.cc
-docs
-libvxi11.so.0
-vxi11_send
+# Object files
 *.o
-*.pyc
-.pc/
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.test
+scpi-parse/examples/*/test
+
+# Backup files
+*~
+scpi-parse/libscpi/obj/
+scpi-parse/libscpi/dist/
+
+scpi-parse/nbproject/
+*.bak
