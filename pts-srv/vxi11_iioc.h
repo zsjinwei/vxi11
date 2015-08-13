@@ -46,6 +46,19 @@ extern "C" {
 #   define __api
 #endif
 
+#define ADC_NAME		"ad7606"
+#define TRIGGER_NAME	"irqtrig37"
+#define PWM_NAME		"pwm0"
+#define DDS_NAME		"ad9854"
+#define DPOT0_NAME		"ad5235.0"
+#define DPOT1_NAME		"ad5235.1"
+#define DPOT2_NAME		"ad5235.2"
+#define DPOT3_NAME		"ad5235.3"
+
+#define PWM_ATTR_ENABLE	"enable"
+#define PWM_ATTR_PERIOD	"period"
+#define PWM_ATTR_DUTY_CYCLE	"duty_cycle"
+
 struct extra_ctx_info {
 	struct iio_context *ctx;
 	unsigned int nb_devices;
@@ -53,20 +66,20 @@ struct extra_ctx_info {
 };
 
 struct extra_chn_info {
-	struct iio_device *dev; //绑定的iio_device
-	float *data_ref;//通道数据存储空间地址
-	off_t offset;//通道数据存储空间偏移
-	bool enabled; //是否使能
+	struct iio_device *dev; //掳贸露篓碌脛iio_device
+	short *data_ref;//脥篓碌脌脢媒戮脻麓忙麓垄驴脮录盲碌脴脰路
+	off_t offset;//脥篓碌脌脢媒戮脻麓忙麓垄驴脮录盲脝芦脪脝
+	bool enabled; //脢脟路帽脢鹿脛脺
 };
 
 struct extra_dev_info {
 	struct extra_ctx_info *ctx_info;
-	bool input_device; //是否是输入设备
+	bool input_device; //脢脟路帽脢脟脢盲脠毛脡猫卤赂
 	unsigned int nb_channels;
 	unsigned int nb_attrs;
-	struct iio_buffer *buffer;//绑定的iio_buffer
-	unsigned int sample_count;//采样数据数量
-	unsigned int buffer_size;//buffer大小
+	struct iio_buffer *buffer;//掳贸露篓碌脛iio_buffer
+	unsigned int sample_count;//虏脡脩霉脢媒戮脻脢媒脕驴
+	unsigned int buffer_size;//buffer麓贸脨隆
 	unsigned int sampling_freq;
 	//char adc_scale;
 };
@@ -84,7 +97,7 @@ __api int iioc_sampling_capture(struct iio_device *adc_dev);
 __api void iioc_ctx_close(struct extra_ctx_info *ctx_info);
 __api void iioc_dev_close(struct iio_device *dev);
 __api int iioc_channel_enable(const struct iio_device *dev, const unsigned int *enable, unsigned int nb_en_channels);
-__api float *iioc_chn_get_data(const struct iio_device *dev, unsigned int chn, unsigned int *data_size);
+__api short *iioc_chn_get_data(const struct iio_device *dev, unsigned int chn, unsigned int *data_size);
 
 #ifdef __cplusplus
 }

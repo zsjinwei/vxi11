@@ -61,14 +61,14 @@ struct extra_ctx_info *iioc_ctx_open(void)
 struct iio_device *iioc_dev_open(struct extra_ctx_info *ctx_info, const char *dev_name)
 {
 	unsigned int j, k;
-	//寻找设备
+	//脩掳脮脪脡猫卤赂
 	struct iio_device *dev = iio_context_find_device(ctx_info->ctx, dev_name);
 	if (!dev) {
 		IIOC_DBG("No such device(%s).\n", dev_name);
 		return NULL;
 	}
 	IIOC_DBG("Open device - %s.\n", dev_name);
-	//分配dev_info空间
+	//路脰脜盲dev_info驴脮录盲
 	struct extra_dev_info *dev_info = (struct extra_dev_info *)calloc(1, sizeof(*dev_info));
 	if (!dev_info) {
 		IIOC_DBG("Can not calloc memory for struct extra_dev_info.\n");
@@ -175,7 +175,7 @@ int iioc_sampling_setup(struct iio_device *adc_dev,
 		IIOC_DBG("adc_dev is not an input device.\n");
 		return -EIO;
 	}
-	//绑定trigger
+	//掳贸露篓trigger
 	ret = iio_device_set_trigger(adc_dev, trigger_dev);
 	if (ret)
 	{
@@ -186,14 +186,14 @@ int iioc_sampling_setup(struct iio_device *adc_dev,
 #endif
 		return -EIO;
 	}
-	//删除旧buffer
+	//脡戮鲁媒戮脡buffer
 	if (dev_info->buffer)
 		iio_buffer_destroy(dev_info->buffer);
 	dev_info->buffer = NULL;
 
-	//设置sample_count(buffer大小)
+	//脡猫脰脙sample_count(buffer麓贸脨隆)
 	dev_info->sample_count = sample_count;
-	//使能通道，并为每个通道分配内存空间
+	//脢鹿脛脺脥篓碌脌拢卢虏垄脦陋脙驴赂枚脥篓碌脌路脰脜盲脛脷麓忙驴脮录盲
 	for (i = 0; i < nb_channels; i++) {
 		struct iio_channel *ch = iio_device_get_channel(adc_dev, i);
 		struct extra_chn_info *chn_info = iio_channel_get_data(ch);
@@ -204,16 +204,16 @@ int iioc_sampling_setup(struct iio_device *adc_dev,
 
 		if (chn_info->data_ref)
 			free(chn_info->data_ref);
-		chn_info->data_ref = (float *)calloc(dev_info->sample_count, sizeof(float));
+		chn_info->data_ref = (short *)calloc(dev_info->sample_count, sizeof(short));
 		if (!chn_info->data_ref) {
 			IIOC_DBG("Can not calloc channel data mem.\n");
 			goto error_calloc_chn_data_ref;
 		}
 	}
 	dev_info->sampling_freq = sampling_freq;
-	//重新绑定数据
+	//脰脴脨脗掳贸露篓脢媒戮脻
 	iio_device_set_data(adc_dev, dev_info);
-	//设置超时
+	//脡猫脰脙鲁卢脢卤
 	if (sampling_freq > 0) {
 		/* 2 x capture time + 2s */
 		unsigned int timeout = dev_info->sample_count * 1000 / sampling_freq;
@@ -365,7 +365,7 @@ int iioc_channel_enable(const struct iio_device *dev, const unsigned int *enable
 }
 
 
-float *iioc_chn_get_data(const struct iio_device *dev, unsigned int chn, unsigned int *data_size)
+short *iioc_chn_get_data(const struct iio_device *dev, unsigned int chn, unsigned int *data_size)
 {
 	assert(dev);
 	struct iio_channel *ch = iio_device_get_channel(dev, chn);
@@ -448,25 +448,25 @@ static ssize_t demux_sample(const struct iio_channel *chn,
 		int8_t val;
 		iio_channel_convert(chn, &val, sample);
 		if (format->is_signed)
-			*(chn_info->data_ref + chn_info->offset++) = (float)val;
+			*(chn_info->data_ref + chn_info->offset++) = (short)val;
 		else
-			*(chn_info->data_ref + chn_info->offset++) = (float)(uint8_t)val;
+			*(chn_info->data_ref + chn_info->offset++) = (short)(uint8_t)val;
 	}
 	else if (size == 2) {
 		int16_t val;
 		iio_channel_convert(chn, &val, sample);
 		if (format->is_signed)
-			*(chn_info->data_ref + chn_info->offset++) = (float)val;
+			*(chn_info->data_ref + chn_info->offset++) = (short)val;
 		else
-			*(chn_info->data_ref + chn_info->offset++) = (float)(uint16_t)val;
+			*(chn_info->data_ref + chn_info->offset++) = (short)(uint16_t)val;
 	}
 	else {
 		int32_t val;
 		iio_channel_convert(chn, &val, sample);
 		if (format->is_signed)
-			*(chn_info->data_ref + chn_info->offset++) = (float)val;
+			*(chn_info->data_ref + chn_info->offset++) = (short)val;
 		else
-			*(chn_info->data_ref + chn_info->offset++) = (float)(uint32_t)val;
+			*(chn_info->data_ref + chn_info->offset++) = (short)(uint32_t)val;
 	}
 
 	return size;

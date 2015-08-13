@@ -9,7 +9,7 @@ SERVER = vxi11_server
 SOURCES_CLNT.c = vxi11_clnt_func.c
 SOURCES_CLNT.h = 
 SOURCES_SVC.c = vxi11_svc_func.c vxi11_iioc.c vxi11_scpi.c
-SOURCES_SVC.h = vxi11_iioc.h vxi11_scpi.h
+SOURCES_SVC.h = vxi11_svc_func.h vxi11_iioc.h vxi11_scpi.h
 SOURCES.x = vxi11.x
 
 TARGETS_SVC.c = vxi11_svc.c vxi11_xdr.c 

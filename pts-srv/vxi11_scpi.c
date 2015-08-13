@@ -1,4 +1,20 @@
+#include "vxi11.h"
 #include "vxi11_scpi.h"
+#include "vxi11_iioc.h"
+
+// === iio struct ===
+extern struct extra_ctx_info *ctx_info;
+extern struct iio_device *adc_dev;
+extern struct iio_device *pwm_dev;
+extern struct iio_device *trigger_dev;
+extern struct iio_device *dds_dev;
+extern struct iio_device *dpot0_dev;
+extern struct iio_device *dpot1_dev;
+extern struct iio_device *dpot2_dev;
+extern struct iio_device *dpot3_dev;
+// =======end========
+
+extern Device_ReadResp read_resp;
 
 size_t SCPI_Write(scpi_t * context, const char * data, size_t len) {
 	(void) context;
@@ -11,7 +27,7 @@ scpi_result_t SCPI_Flush(scpi_t * context) {
 
 int SCPI_Error(scpi_t * context, int_fast16_t err) {
 	(void) context;
-
+	read_resp.error = VXI_PARAM_ERROR;
 	fprintf(stderr, "**ERROR: %d, \"%s\"\r\n", (int16_t) err, SCPI_ErrorTranslate(err));
 	return 0;
 }
@@ -29,6 +45,418 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
 	fprintf(stderr, "**Reset\r\n");
 	return SCPI_RES_OK;
 }
+
+static scpi_result_t  PTS_MeasureChannelEnableQ(scpi_t * context)
+{
+	int32_t chn_idx;
+	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
+	if (!adc_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	unsigned int nb_channels = iio_device_get_channels_count(adc_dev);
+	SCPI_CommandNumbers(context, &chn_idx, 1);
+	if (nb_channels == 0 || nb_channels < chn_idx || chn_idx < 0) {
+		return SCPI_RES_ERR;
+	}
+
+	struct iio_channel *chn = iio_device_get_channel(adc_dev, chn_idx);
+	if (!chn) {
+		return SCPI_RES_ERR;
+	}
+
+	if (iio_channel_is_enabled (chn)) {
+		resp_data.error = VXI_NO_ERROR;
+		resp_data.data.data_len = 2;
+		strcpy(resp_data.data.data_val, "1");
+	}
+	else {
+		resp_data.error = VXI_NO_ERROR;
+		resp_data.data.data_len = 2;
+		strcpy(resp_data.data.data_val, "0");
+	}
+
+	return SCPI_RES_OK;
+}
+
+static scpi_result_t  PTS_MeasureEnableQ(scpi_t * context)
+{
+	int ret = 0;
+	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
+	if (!pwm_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	ret = iioc_read_attr(pwm_dev, PWM_ATTR_ENABLE, resp_data.data.data_val);
+	if (ret > 0) {
+		resp_data.error = VXI_NO_ERROR;
+		resp_data.data.data_len = ret;
+		return SCPI_RES_OK;
+	}
+	else {
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_MeasureResistanceQ(scpi_t * context)
+{
+	return SCPI_RES_OK;
+}
+
+static scpi_result_t  PTS_MeasureFrequencyQ(scpi_t * context)
+{
+	char rw_buf[30];
+	int ret = 0;
+	int period;
+	unsigned int freq;
+	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
+	if (!pwm_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	ret = iioc_read_attr(pwm_dev, PWM_ATTR_PERIOD, rw_buf);
+	if (ret > 0) {
+		period = atoi(rw_buf);
+	}
+	else {
+		return SCPI_RES_ERR;
+	}
+	if (period <= 0) {
+		freq = 0;
+	}
+	else {
+		freq = (unsigned int)((1.0 / period) * 1000000000.0);
+	}
+	ret = sprintf(resp_data.data.data_val, "%d", freq);
+	if (ret > 0) {
+		resp_data.error = VXI_NO_ERROR;
+		resp_data.data.data_len = ret;
+		return SCPI_RES_OK;
+	}
+	else {
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_MeasurePeriodQ(scpi_t * context)
+{
+	int ret = 0;
+	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
+	if (!pwm_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	ret = iioc_read_attr(pwm_dev, PWM_ATTR_PERIOD, resp_data.data.data_val);
+	if (ret > 0) {
+		resp_data.error = VXI_NO_ERROR;
+		resp_data.data.data_len = ret;
+		return SCPI_RES_OK;
+	}
+	else {
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_MeasureDutyCycleQ(scpi_t * context)
+{
+	int ret = 0;
+	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
+	if (!pwm_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	ret = iioc_read_attr(pwm_dev, PWM_ATTR_DUTY_CYCLE, resp_data.data.data_val);
+	if (ret > 0) {
+		resp_data.error = VXI_NO_ERROR;
+		resp_data.data.data_len = ret;
+		return SCPI_RES_OK;
+	}
+	else {
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_MeasureChannelEnable(scpi_t * context)
+{
+	int32_t chn_idx;
+	scpi_bool_t chn_enable;
+	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
+	if (!adc_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	unsigned int nb_channels = iio_device_get_channels_count(adc_dev);
+	// read channel index
+	SCPI_CommandNumbers(context, &chn_idx, 1);
+	if (nb_channels == 0 || nb_channels < chn_idx || chn_idx < 0) {
+		return SCPI_RES_ERR;
+	}
+
+	struct iio_channel *chn = iio_device_get_channel(adc_dev, chn_idx);
+	if (!chn) {
+		return SCPI_RES_ERR;
+	}
+	struct extra_chn_info *chn_info = iio_channel_get_data(ch);
+	if (!chn_info) {
+		return SCPI_RES_ERR;
+	}
+	else {
+		chn_info->enable = 1;
+	}
+	// read first parameter if present
+	if (!SCPI_ParamBool(context, &chn_enable, TRUE)) {
+		return SCPI_RES_ERR;
+	}
+
+	if (chn_enable) {
+		iio_channel_enable(chn);
+	}
+	else {
+		iio_channel_disable(chn);
+	}
+	return SCPI_RES_OK;
+}
+
+static scpi_result_t  PTS_MeasureEnable(scpi_t * context)
+{
+	int ret = 0;
+	scpi_bool_t meas_enable;
+	// read first parameter if present
+	if (!SCPI_ParamBool(context, &meas_enable, TRUE)) {
+		return SCPI_RES_ERR;
+	}
+
+	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
+	if (!pwm_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	if (meas_enable) {
+		ret = iioc_write_attr(pwm_dev, PWM_ATTR_ENABLE, "1");
+	}
+	else {
+		ret = iioc_write_attr(pwm_dev, PWM_ATTR_ENABLE, "0");
+	}
+	if (!ret) {
+		return SCPI_RES_OK;
+	}
+	else {
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_MeasureResistance(scpi_t * context)
+{
+	return SCPI_RES_OK;
+}
+
+static scpi_result_t  PTS_MeasureFrequency(scpi_t * context)
+{
+	int ret = 0;
+	unsigned int period;
+	unsigned int duty_cycle;
+	char rw_buf[30];
+	scpi_number_t freq_t;
+	// read first parameter if present
+	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &freq_t, TRUE)) {
+		return SCPI_RES_ERR;
+	}
+	if (freq_t.value <= 0.0) {
+		return SCPI_RES_ERR;
+	}
+
+	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
+	if (!pwm_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	period = (unsigned int)((1.0 / freq_t.value) * 1000000000.0);
+	duty_cycle = preiod / 2;
+
+	ret = sprintf(rw_buf, "%u", period);
+	if (ret > 0) {
+		ret = iioc_write_attr(pwm_dev, PWM_ATTR_PERIOD, rw_buf);
+		if (ret) {
+			return SCPI_RES_ERR;
+		}
+		else {
+			ret = sprintf(rw_buf, "%u", duty_cycle);
+			if (ret > 0) {
+				ret = iioc_write_attr(pwm_dev, PWM_ATTR_DUTY_CYCLE, rw_buf);
+				if (ret) {
+					return SCPI_RES_ERR;
+				}
+				else {
+					return SCPI_RES_OK;
+				}
+			}
+			else {
+				return SCPI_RES_ERR;
+			}
+		}
+	}
+	else {
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_MeasurePeriod(scpi_t * context)
+{
+	int ret = 0;
+	unsigned int period;
+	char rw_buf[30];
+	scpi_number_t period_t;
+	// read first parameter if present
+	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &period_t, TRUE)) {
+		return SCPI_RES_ERR;
+	}
+	if (period_t.value <= 0.0) {
+		return SCPI_RES_ERR;
+	}
+	if (period_t.unit == 6) {
+		preiod = (unsigned int)period_t.value * 1000000000.0;
+	}
+	else {
+		preiod = (unsigned int)period_t.value;
+	}
+
+	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
+	if (!pwm_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	ret = sprintf(rw_buf, "%u", period);
+	if (ret > 0) {
+		ret = iioc_write_attr(pwm_dev, PWM_ATTR_PERIOD, rw_buf);
+		if (ret) {
+			return SCPI_RES_ERR;
+		}
+		else {
+			return SCPI_RES_OK;
+		}
+	}
+	else {
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_MeasureDutyCycle(scpi_t * context)
+{
+	int ret = 0;
+	unsigned int duty_cycle;
+	char rw_buf[30];
+	scpi_number_t duty_cycle_t;
+	// read first parameter if present
+	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &duty_cycle_t, TRUE)) {
+		return SCPI_RES_ERR;
+	}
+	if (duty_cycle_t.value <= 0.0) {
+		return SCPI_RES_ERR;
+	}
+	if (duty_cycle_t.unit == 6) {
+		preiod = (unsigned int)duty_cycle_t.value * 1000000000.0;
+	}
+	else {
+		preiod = (unsigned int)duty_cycle_t.value;
+	}
+
+	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
+	if (!pwm_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	ret = sprintf(rw_buf, "%u", duty_cycle);
+	if (ret > 0) {
+		ret = iioc_write_attr(pwm_dev, PWM_ATTR_DUTY_CYCLE, rw_buf);
+		if (ret) {
+			return SCPI_RES_ERR;
+		}
+		else {
+			return SCPI_RES_OK;
+		}
+	}
+	else {
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_BufferClear(scpi_t * context)
+{
+	resp_data.error = VXI_NO_ERROR;
+	resp_data.data.data_len = 0;
+	return SCPI_RES_OK;
+}
+
+static scpi_result_t  PTS_BufferSamplingSetup(scpi_t * context)
+{
+	int ret = 0;
+	scpi_number_t sampling_freq_t, sample_count_t;
+	// read first parameter if present
+	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &sampling_freq_t, TRUE)) {
+		return SCPI_RES_ERR;
+	}
+
+	// read second paraeter if present
+	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &sample_count_t, TRUE)) {
+		return SCPI_RES_ERR;
+	}
+	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
+	struct iio_device *trigger_dev = iio_context_find_device(ctx_info->ctx, TRIGGER_NAME);
+	if ((!adc_dev) || (!trigger_dev)) {
+		return SCPI_RES_ERR;
+	}
+	ret = iioc_sampling_setup(adc_dev, trigger_dev, sampling_freq_t.value, sample_count_t.value);
+	if (ret) {
+		return SCPI_RES_ERR;
+	}
+	return SCPI_RES_OK;
+}
+
+static scpi_result_t  PTS_BufferSamplingCapture(scpi_t * context)
+{
+	int ret = 0;
+	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
+	ret = iioc_sampling_capture(adc_dev);
+	if (ret) {
+		return SCPI_RES_ERR;
+	}
+	return SCPI_RES_OK;
+}
+
+static scpi_result_t  PTS_BufferFetchQ(scpi_t * context)
+{
+	int32_t chn_idx;
+	scpi_bool_t chn_enable;
+	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
+	if (!adc_dev) {
+		return SCPI_RES_ERR;
+	}
+
+	unsigned int nb_channels = iio_device_get_channels_count(adc_dev);
+	// read channel index
+	SCPI_CommandNumbers(context, &chn_idx, 1);
+	if (nb_channels == 0 || nb_channels < chn_idx || chn_idx < 0) {
+		return SCPI_RES_ERR;
+	}
+
+	struct iio_channel *chn = iio_device_get_channel(adc_dev, chn_idx);
+	if (!chn) {
+		return SCPI_RES_ERR;
+	}
+
+	struct extra_chn_info *chn_info = iio_channel_get_data(chn);
+	if (!chn_info)
+	{
+		return SCPI_RES_ERR;
+	}
+
+	memcpy((char *)resp_data.data.data_val, (char *)chn_info->data_ref, chn_info->offset * 2);
+	resp_data.error = VXI_NO_ERROR;
+	resp_data.data.data_len = chn_info->offset * 2;
+	return SCPI_RES_OK;
+}
+
+
 
 static scpi_result_t TEST_Bool(scpi_t * context) {
 	scpi_bool_t param1;
@@ -152,11 +580,24 @@ static const scpi_command_t scpi_commands[] = {
 	{.pattern = "STATus:PRESet", .callback = SCPI_StatusPreset,},
 
 	/* PTS */
-	{.pattern = "MEASure:VOLTage:DC?", .callback = DMM_MeasureVoltageDcQ,},
-	{.pattern = "MEASure:RESistance?", .callback = SCPI_StubQ,},
-	{.pattern = "MEASure:FRESistance?", .callback = SCPI_StubQ,},
-	{.pattern = "MEASure:FREQuency?", .callback = SCPI_StubQ,},
-	{.pattern = "MEASure:PERiod?", .callback = SCPI_StubQ,},
+	{.pattern = "MEASure:CHANnel#:ENABle?", .callback = PTS_MeasureChannelEnableQ,},
+	{.pattern = "MEASure:ENABle?", .callback = PTS_MeasureEnableQ,},
+	{.pattern = "MEASure:RESistance?", .callback = PTS_MeasureResistanceQ,},
+	{.pattern = "MEASure:FREQuency?", .callback = PTS_MeasureFrequencyQ,},
+	{.pattern = "MEASure:PERiod?", .callback = PTS_MeasurePeriodQ,},
+	{.pattern = "MEASure:DCYCle?", .callback = PTS_MeasureDutyCycleQ,},
+
+	{.pattern = "CONFigure:CHANnel#:ENABle", .callback = PTS_MeasureChannelEnable,},
+	{.pattern = "CONFigure:ENABle", .callback = PTS_MeasureEnable,},
+	{.pattern = "CONFigure:RESistance", .callback = PTS_MeasureResistance,},
+	{.pattern = "CONFigure:FREQuency", .callback = PTS_MeasureFrequency,},
+	{.pattern = "CONFigure:PERiod", .callback = PTS_MeasurePeriod,},
+	{.pattern = "CONFigure:DCYCle", .callback = PTS_MeasureDutyCycle,},
+
+	{.pattern = "BUFFer:CLEar", .callback = PTS_BufferClear,},
+	{.pattern = "BUFFer:SSETup", .callback = PTS_BufferSamplingSetup,},
+	{.pattern = "BUFFer:SCAPture", .callback = PTS_BufferSamplingCapture,},
+	{.pattern = "BUFFer:FETCh:CHANnel#?", .callback = PTS_BufferFetchQ,},
 	/* DMM */
 	// {.pattern = "MEASure:VOLTage:DC?", .callback = DMM_MeasureVoltageDcQ,},
 	// {.pattern = "CONFigure:VOLTage:DC", .callback = DMM_ConfigureVoltageDc,},
@@ -203,5 +644,5 @@ scpi_t scpi_context = {
 	.interface = &scpi_interface,
 	.registers = scpi_regs,
 	.units = scpi_units_def,
-	.idn = {"MANUFACTURE", "INSTR2013", NULL, "01-02"},
+	.idn = {"SYSU-SIST637", "INSTR2015", NULL, "08-13"},
 };

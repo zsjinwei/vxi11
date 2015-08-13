@@ -1,0 +1,367 @@
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+CC	Makefile	/^CC ?= arm-linux-gnueabihf-gcc$/;"	m
+CLIENT	Makefile	/^CLIENT = vxi11_client$/;"	m
+OBJECTS_CLNT	Makefile	/^OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)$/;"	m
+OBJECTS_SVC	Makefile	/^OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o) $(TARGETS_SVC.c:%.c=%.o)$/;"	m
+RPCGENFLAGS	Makefile	/^RPCGENFLAGS = $/;"	m
+SERVER	Makefile	/^SERVER = vxi11_server$/;"	m
+SOURCES.x	Makefile	/^SOURCES.x = vxi11.x$/;"	m
+SOURCES_CLNT.c	Makefile	/^SOURCES_CLNT.c = vxi11_clnt_func.c$/;"	m
+SOURCES_CLNT.h	Makefile	/^SOURCES_CLNT.h = $/;"	m
+SOURCES_SVC.c	Makefile	/^SOURCES_SVC.c = vxi11_svc_func.c vxi11_iioc.c vxi11_scpi.c$/;"	m
+SOURCES_SVC.h	Makefile	/^SOURCES_SVC.h = vxi11_svc_func.h vxi11_iioc.h vxi11_scpi.h$/;"	m
+TARGETS	Makefile	/^TARGETS = vxi11.h vxi11_xdr.c vxi11_clnt.c vxi11_svc.c $/;"	m
+TARGETS_CLNT.c	Makefile	/^TARGETS_CLNT.c = vxi11_clnt.c vxi11_xdr.c $/;"	m
+TARGETS_SVC.c	Makefile	/^TARGETS_SVC.c = vxi11_svc.c vxi11_xdr.c $/;"	m
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+Create_LinkParms	vxi11.h	/^struct Create_LinkParms {$/;"	s
+Create_LinkParms	vxi11.h	/^typedef struct Create_LinkParms Create_LinkParms;$/;"	t	typeref:struct:Create_LinkParms
+Create_LinkResp	vxi11.h	/^struct Create_LinkResp {$/;"	s
+Create_LinkResp	vxi11.h	/^typedef struct Create_LinkResp Create_LinkResp;$/;"	t	typeref:struct:Create_LinkResp
+DEVICE_ASYNC	vxi11.h	160;"	d
+DEVICE_ASYNC_VERSION	vxi11.h	161;"	d
+DEVICE_CORE	vxi11.h	176;"	d
+DEVICE_CORE_VERSION	vxi11.h	177;"	d
+DEVICE_INTR	vxi11.h	276;"	d
+DEVICE_INTR_VERSION	vxi11.h	277;"	d
+DEVICE_TCP	vxi11.h	/^	DEVICE_TCP = 0,$/;"	e	enum:Device_AddrFamily
+DEVICE_UDP	vxi11.h	/^	DEVICE_UDP = 1,$/;"	e	enum:Device_AddrFamily
+Device_AddrFamily	vxi11.h	/^enum Device_AddrFamily {$/;"	g
+Device_AddrFamily	vxi11.h	/^typedef enum Device_AddrFamily Device_AddrFamily;$/;"	t	typeref:enum:Device_AddrFamily
+Device_DocmdParms	vxi11.h	/^struct Device_DocmdParms {$/;"	s
+Device_DocmdParms	vxi11.h	/^typedef struct Device_DocmdParms Device_DocmdParms;$/;"	t	typeref:struct:Device_DocmdParms
+Device_DocmdResp	vxi11.h	/^struct Device_DocmdResp {$/;"	s
+Device_DocmdResp	vxi11.h	/^typedef struct Device_DocmdResp Device_DocmdResp;$/;"	t	typeref:struct:Device_DocmdResp
+Device_EnableSrqParms	vxi11.h	/^struct Device_EnableSrqParms {$/;"	s
+Device_EnableSrqParms	vxi11.h	/^typedef struct Device_EnableSrqParms Device_EnableSrqParms;$/;"	t	typeref:struct:Device_EnableSrqParms
+Device_Error	vxi11.h	/^struct Device_Error {$/;"	s
+Device_Error	vxi11.h	/^typedef struct Device_Error Device_Error;$/;"	t	typeref:struct:Device_Error
+Device_ErrorCode	vxi11.h	/^typedef long Device_ErrorCode;$/;"	t
+Device_Flags	vxi11.h	/^typedef long Device_Flags;$/;"	t
+Device_GenericParms	vxi11.h	/^struct Device_GenericParms {$/;"	s
+Device_GenericParms	vxi11.h	/^typedef struct Device_GenericParms Device_GenericParms;$/;"	t	typeref:struct:Device_GenericParms
+Device_Link	vxi11.h	/^typedef long Device_Link;$/;"	t
+Device_LockParms	vxi11.h	/^struct Device_LockParms {$/;"	s
+Device_LockParms	vxi11.h	/^typedef struct Device_LockParms Device_LockParms;$/;"	t	typeref:struct:Device_LockParms
+Device_ReadParms	vxi11.h	/^struct Device_ReadParms {$/;"	s
+Device_ReadParms	vxi11.h	/^typedef struct Device_ReadParms Device_ReadParms;$/;"	t	typeref:struct:Device_ReadParms
+Device_ReadResp	vxi11.h	/^struct Device_ReadResp {$/;"	s
+Device_ReadResp	vxi11.h	/^typedef struct Device_ReadResp Device_ReadResp;$/;"	t	typeref:struct:Device_ReadResp
+Device_ReadStbResp	vxi11.h	/^struct Device_ReadStbResp {$/;"	s
+Device_ReadStbResp	vxi11.h	/^typedef struct Device_ReadStbResp Device_ReadStbResp;$/;"	t	typeref:struct:Device_ReadStbResp
+Device_RemoteFunc	vxi11.h	/^struct Device_RemoteFunc {$/;"	s
+Device_RemoteFunc	vxi11.h	/^typedef struct Device_RemoteFunc Device_RemoteFunc;$/;"	t	typeref:struct:Device_RemoteFunc
+Device_SrqParms	vxi11.h	/^struct Device_SrqParms {$/;"	s
+Device_SrqParms	vxi11.h	/^typedef struct Device_SrqParms Device_SrqParms;$/;"	t	typeref:struct:Device_SrqParms
+Device_WriteParms	vxi11.h	/^struct Device_WriteParms {$/;"	s
+Device_WriteParms	vxi11.h	/^typedef struct Device_WriteParms Device_WriteParms;$/;"	t	typeref:struct:Device_WriteParms
+Device_WriteResp	vxi11.h	/^struct Device_WriteResp {$/;"	s
+Device_WriteResp	vxi11.h	/^typedef struct Device_WriteResp Device_WriteResp;$/;"	t	typeref:struct:Device_WriteResp
+_VXI11_H_RPCGEN	vxi11.h	7;"	d
+abortPort	vxi11.h	/^	u_short abortPort;$/;"	m	struct:Create_LinkResp
+clientId	vxi11.h	/^	long clientId;$/;"	m	struct:Create_LinkParms
+cmd	vxi11.h	/^	long cmd;$/;"	m	struct:Device_DocmdParms
+create_intr_chan	vxi11.h	219;"	d
+create_intr_chan	vxi11.h	267;"	d
+create_link	vxi11.h	180;"	d
+create_link	vxi11.h	228;"	d
+data	vxi11.h	/^	} data;$/;"	m	struct:Device_ReadResp	typeref:struct:Device_ReadResp::__anon2
+data	vxi11.h	/^	} data;$/;"	m	struct:Device_WriteParms	typeref:struct:Device_WriteParms::__anon1
+data_in	vxi11.h	/^	} data_in;$/;"	m	struct:Device_DocmdParms	typeref:struct:Device_DocmdParms::__anon4
+data_in_len	vxi11.h	/^		u_int data_in_len;$/;"	m	struct:Device_DocmdParms::__anon4
+data_in_val	vxi11.h	/^		char *data_in_val;$/;"	m	struct:Device_DocmdParms::__anon4
+data_len	vxi11.h	/^		u_int data_len;$/;"	m	struct:Device_ReadResp::__anon2
+data_len	vxi11.h	/^		u_int data_len;$/;"	m	struct:Device_WriteParms::__anon1
+data_out	vxi11.h	/^	} data_out;$/;"	m	struct:Device_DocmdResp	typeref:struct:Device_DocmdResp::__anon5
+data_out_len	vxi11.h	/^		u_int data_out_len;$/;"	m	struct:Device_DocmdResp::__anon5
+data_out_val	vxi11.h	/^		char *data_out_val;$/;"	m	struct:Device_DocmdResp::__anon5
+data_val	vxi11.h	/^		char *data_val;$/;"	m	struct:Device_ReadResp::__anon2
+data_val	vxi11.h	/^		char *data_val;$/;"	m	struct:Device_WriteParms::__anon1
+datasize	vxi11.h	/^	long datasize;$/;"	m	struct:Device_DocmdParms
+destroy_intr_chan	vxi11.h	222;"	d
+destroy_intr_chan	vxi11.h	270;"	d
+destroy_link	vxi11.h	216;"	d
+destroy_link	vxi11.h	264;"	d
+device	vxi11.h	/^	char *device;$/;"	m	struct:Create_LinkParms
+device_abort	vxi11.h	164;"	d
+device_abort	vxi11.h	170;"	d
+device_clear	vxi11.h	195;"	d
+device_clear	vxi11.h	243;"	d
+device_docmd	vxi11.h	213;"	d
+device_docmd	vxi11.h	261;"	d
+device_enable_srq	vxi11.h	210;"	d
+device_enable_srq	vxi11.h	258;"	d
+device_intr_srq	vxi11.h	280;"	d
+device_intr_srq	vxi11.h	286;"	d
+device_local	vxi11.h	201;"	d
+device_local	vxi11.h	249;"	d
+device_lock	vxi11.h	204;"	d
+device_lock	vxi11.h	252;"	d
+device_read	vxi11.h	186;"	d
+device_read	vxi11.h	234;"	d
+device_readstb	vxi11.h	189;"	d
+device_readstb	vxi11.h	237;"	d
+device_remote	vxi11.h	198;"	d
+device_remote	vxi11.h	246;"	d
+device_trigger	vxi11.h	192;"	d
+device_trigger	vxi11.h	240;"	d
+device_unlock	vxi11.h	207;"	d
+device_unlock	vxi11.h	255;"	d
+device_write	vxi11.h	183;"	d
+device_write	vxi11.h	231;"	d
+enable	vxi11.h	/^	bool_t enable;$/;"	m	struct:Device_EnableSrqParms
+error	vxi11.h	/^	Device_ErrorCode error;$/;"	m	struct:Create_LinkResp
+error	vxi11.h	/^	Device_ErrorCode error;$/;"	m	struct:Device_DocmdResp
+error	vxi11.h	/^	Device_ErrorCode error;$/;"	m	struct:Device_Error
+error	vxi11.h	/^	Device_ErrorCode error;$/;"	m	struct:Device_ReadResp
+error	vxi11.h	/^	Device_ErrorCode error;$/;"	m	struct:Device_ReadStbResp
+error	vxi11.h	/^	Device_ErrorCode error;$/;"	m	struct:Device_WriteResp
+flags	vxi11.h	/^	Device_Flags flags;$/;"	m	struct:Device_DocmdParms
+flags	vxi11.h	/^	Device_Flags flags;$/;"	m	struct:Device_GenericParms
+flags	vxi11.h	/^	Device_Flags flags;$/;"	m	struct:Device_LockParms
+flags	vxi11.h	/^	Device_Flags flags;$/;"	m	struct:Device_ReadParms
+flags	vxi11.h	/^	Device_Flags flags;$/;"	m	struct:Device_WriteParms
+handle	vxi11.h	/^	} handle;$/;"	m	struct:Device_EnableSrqParms	typeref:struct:Device_EnableSrqParms::__anon3
+handle	vxi11.h	/^	} handle;$/;"	m	struct:Device_SrqParms	typeref:struct:Device_SrqParms::__anon6
+handle_len	vxi11.h	/^		u_int handle_len;$/;"	m	struct:Device_EnableSrqParms::__anon3
+handle_len	vxi11.h	/^		u_int handle_len;$/;"	m	struct:Device_SrqParms::__anon6
+handle_val	vxi11.h	/^		char *handle_val;$/;"	m	struct:Device_EnableSrqParms::__anon3
+handle_val	vxi11.h	/^		char *handle_val;$/;"	m	struct:Device_SrqParms::__anon6
+hostAddr	vxi11.h	/^	u_long hostAddr;$/;"	m	struct:Device_RemoteFunc
+hostPort	vxi11.h	/^	u_long hostPort;$/;"	m	struct:Device_RemoteFunc
+io_timeout	vxi11.h	/^	u_long io_timeout;$/;"	m	struct:Device_DocmdParms
+io_timeout	vxi11.h	/^	u_long io_timeout;$/;"	m	struct:Device_GenericParms
+io_timeout	vxi11.h	/^	u_long io_timeout;$/;"	m	struct:Device_ReadParms
+io_timeout	vxi11.h	/^	u_long io_timeout;$/;"	m	struct:Device_WriteParms
+lid	vxi11.h	/^	Device_Link lid;$/;"	m	struct:Create_LinkResp
+lid	vxi11.h	/^	Device_Link lid;$/;"	m	struct:Device_DocmdParms
+lid	vxi11.h	/^	Device_Link lid;$/;"	m	struct:Device_EnableSrqParms
+lid	vxi11.h	/^	Device_Link lid;$/;"	m	struct:Device_GenericParms
+lid	vxi11.h	/^	Device_Link lid;$/;"	m	struct:Device_LockParms
+lid	vxi11.h	/^	Device_Link lid;$/;"	m	struct:Device_ReadParms
+lid	vxi11.h	/^	Device_Link lid;$/;"	m	struct:Device_WriteParms
+lockDevice	vxi11.h	/^	bool_t lockDevice;$/;"	m	struct:Create_LinkParms
+lock_timeout	vxi11.h	/^	u_long lock_timeout;$/;"	m	struct:Create_LinkParms
+lock_timeout	vxi11.h	/^	u_long lock_timeout;$/;"	m	struct:Device_DocmdParms
+lock_timeout	vxi11.h	/^	u_long lock_timeout;$/;"	m	struct:Device_GenericParms
+lock_timeout	vxi11.h	/^	u_long lock_timeout;$/;"	m	struct:Device_LockParms
+lock_timeout	vxi11.h	/^	u_long lock_timeout;$/;"	m	struct:Device_ReadParms
+lock_timeout	vxi11.h	/^	u_long lock_timeout;$/;"	m	struct:Device_WriteParms
+maxRecvSize	vxi11.h	/^	u_long maxRecvSize;$/;"	m	struct:Create_LinkResp
+network_order	vxi11.h	/^	bool_t network_order;$/;"	m	struct:Device_DocmdParms
+progFamily	vxi11.h	/^	Device_AddrFamily progFamily;$/;"	m	struct:Device_RemoteFunc
+progNum	vxi11.h	/^	u_long progNum;$/;"	m	struct:Device_RemoteFunc
+progVers	vxi11.h	/^	u_long progVers;$/;"	m	struct:Device_RemoteFunc
+reason	vxi11.h	/^	long reason;$/;"	m	struct:Device_ReadResp
+requestSize	vxi11.h	/^	u_long requestSize;$/;"	m	struct:Device_ReadParms
+size	vxi11.h	/^	u_long size;$/;"	m	struct:Device_WriteResp
+stb	vxi11.h	/^	u_char stb;$/;"	m	struct:Device_ReadStbResp
+termChar	vxi11.h	/^	char termChar;$/;"	m	struct:Device_ReadParms
+TIMEOUT	vxi11_clnt.c	/^static struct timeval TIMEOUT = { 25, 0 };$/;"	v	typeref:struct:timeval	file:
+create_intr_chan_1	vxi11_clnt.c	/^create_intr_chan_1(Device_RemoteFunc *argp, CLIENT *clnt)$/;"	f
+create_link_1	vxi11_clnt.c	/^create_link_1(Create_LinkParms *argp, CLIENT *clnt)$/;"	f
+destroy_intr_chan_1	vxi11_clnt.c	/^destroy_intr_chan_1(void *argp, CLIENT *clnt)$/;"	f
+destroy_link_1	vxi11_clnt.c	/^destroy_link_1(Device_Link *argp, CLIENT *clnt)$/;"	f
+device_abort_1	vxi11_clnt.c	/^device_abort_1(Device_Link *argp, CLIENT *clnt)$/;"	f
+device_clear_1	vxi11_clnt.c	/^device_clear_1(Device_GenericParms *argp, CLIENT *clnt)$/;"	f
+device_docmd_1	vxi11_clnt.c	/^device_docmd_1(Device_DocmdParms *argp, CLIENT *clnt)$/;"	f
+device_enable_srq_1	vxi11_clnt.c	/^device_enable_srq_1(Device_EnableSrqParms *argp, CLIENT *clnt)$/;"	f
+device_intr_srq_1	vxi11_clnt.c	/^device_intr_srq_1(Device_SrqParms *argp, CLIENT *clnt)$/;"	f
+device_local_1	vxi11_clnt.c	/^device_local_1(Device_GenericParms *argp, CLIENT *clnt)$/;"	f
+device_lock_1	vxi11_clnt.c	/^device_lock_1(Device_LockParms *argp, CLIENT *clnt)$/;"	f
+device_read_1	vxi11_clnt.c	/^device_read_1(Device_ReadParms *argp, CLIENT *clnt)$/;"	f
+device_readstb_1	vxi11_clnt.c	/^device_readstb_1(Device_GenericParms *argp, CLIENT *clnt)$/;"	f
+device_remote_1	vxi11_clnt.c	/^device_remote_1(Device_GenericParms *argp, CLIENT *clnt)$/;"	f
+device_trigger_1	vxi11_clnt.c	/^device_trigger_1(Device_GenericParms *argp, CLIENT *clnt)$/;"	f
+device_unlock_1	vxi11_clnt.c	/^device_unlock_1(Device_Link *argp, CLIENT *clnt)$/;"	f
+device_write_1	vxi11_clnt.c	/^device_write_1(Device_WriteParms *argp, CLIENT *clnt)$/;"	f
+device_async_1	vxi11_clnt_func.c	/^device_async_1(char *host)$/;"	f
+device_core_1	vxi11_clnt_func.c	/^device_core_1(char *host)$/;"	f
+device_intr_1	vxi11_clnt_func.c	/^device_intr_1(char *host)$/;"	f
+main	vxi11_clnt_func.c	/^main (int argc, char *argv[])$/;"	f
+_CRT_SECURE_NO_WARNINGS	vxi11_iioc.c	1;"	d	file:
+demux_sample	vxi11_iioc.c	/^static ssize_t demux_sample(const struct iio_channel *chn,$/;"	f	file:
+device_type_get	vxi11_iioc.c	/^static bool device_type_get(const struct iio_device *dev, int type)$/;"	f	file:
+disable_all_channels	vxi11_iioc.c	/^static void disable_all_channels(struct iio_device *dev)$/;"	f	file:
+enable_all_channels	vxi11_iioc.c	/^static void enable_all_channels(struct iio_device *dev)$/;"	f	file:
+iioc_channel_enable	vxi11_iioc.c	/^int iioc_channel_enable(const struct iio_device *dev, const unsigned int *enable, unsigned int nb_en_channels)$/;"	f
+iioc_chn_get_data	vxi11_iioc.c	/^float *iioc_chn_get_data(const struct iio_device *dev, unsigned int chn, unsigned int *data_size)$/;"	f
+iioc_ctx_close	vxi11_iioc.c	/^void iioc_ctx_close(struct extra_ctx_info *ctx_info)$/;"	f
+iioc_ctx_open	vxi11_iioc.c	/^struct extra_ctx_info *iioc_ctx_open(void)$/;"	f
+iioc_dev_close	vxi11_iioc.c	/^void iioc_dev_close(struct iio_device *dev)$/;"	f
+iioc_dev_open	vxi11_iioc.c	/^struct iio_device *iioc_dev_open(struct extra_ctx_info *ctx_info, const char *dev_name)$/;"	f
+iioc_read_attr	vxi11_iioc.c	/^int iioc_read_attr(struct iio_device *dev, const char *attr_name, char *attr_val)$/;"	f
+iioc_sampling_capture	vxi11_iioc.c	/^int iioc_sampling_capture(struct iio_device *adc_dev)$/;"	f
+iioc_sampling_setup	vxi11_iioc.c	/^int iioc_sampling_setup(struct iio_device *adc_dev,$/;"	f
+iioc_write_attr	vxi11_iioc.c	/^int iioc_write_attr(struct iio_device *dev, const char *attr_name, const char *attr_val)$/;"	f
+is_input_device	vxi11_iioc.c	/^static bool is_input_device(const struct iio_device *dev)$/;"	f	file:
+is_output_device	vxi11_iioc.c	/^static bool is_output_device(const struct iio_device *dev)$/;"	f	file:
+ADC_NAME	vxi11_iioc.h	49;"	d
+DDS_NAME	vxi11_iioc.h	52;"	d
+DPOT0_NAME	vxi11_iioc.h	53;"	d
+DPOT1_NAME	vxi11_iioc.h	54;"	d
+DPOT2_NAME	vxi11_iioc.h	55;"	d
+DPOT3_NAME	vxi11_iioc.h	56;"	d
+IIOC_DBG	vxi11_iioc.h	10;"	d
+IIOC_DBG	vxi11_iioc.h	12;"	d
+PWM_NAME	vxi11_iioc.h	51;"	d
+TRIGGER_NAME	vxi11_iioc.h	50;"	d
+_DEBUG	vxi11_iioc.h	8;"	d
+__VXI11_IIOC_H__	vxi11_iioc.h	2;"	d
+__api	vxi11_iioc.h	39;"	d
+__api	vxi11_iioc.h	41;"	d
+__api	vxi11_iioc.h	44;"	d
+__api	vxi11_iioc.h	46;"	d
+__cnst	vxi11_iioc.h	28;"	d
+__cnst	vxi11_iioc.h	32;"	d
+__notused	vxi11_iioc.h	30;"	d
+__notused	vxi11_iioc.h	34;"	d
+__pure	vxi11_iioc.h	29;"	d
+__pure	vxi11_iioc.h	33;"	d
+buffer	vxi11_iioc.h	/^	struct iio_buffer *buffer;\/\/°ó¶¨µÄiio_buffer$/;"	m	struct:extra_dev_info	typeref:struct:extra_dev_info::iio_buffer
+buffer_size	vxi11_iioc.h	/^	unsigned int buffer_size;\/\/buffer´óÐ¡$/;"	m	struct:extra_dev_info
+ctx	vxi11_iioc.h	/^	struct iio_context *ctx;$/;"	m	struct:extra_ctx_info	typeref:struct:extra_ctx_info::iio_context
+ctx_info	vxi11_iioc.h	/^	struct extra_ctx_info *ctx_info;$/;"	m	struct:extra_dev_info	typeref:struct:extra_dev_info::extra_ctx_info
+data_ref	vxi11_iioc.h	/^	float *data_ref;\/\/Í¨µÀÊý¾Ý´æ´¢¿Õ¼äµØÖ·$/;"	m	struct:extra_chn_info
+dev	vxi11_iioc.h	/^	struct iio_device *dev; \/\/°ó¶¨µÄiio_device$/;"	m	struct:extra_chn_info	typeref:struct:extra_chn_info::iio_device
+enabled	vxi11_iioc.h	/^	bool enabled; \/\/ÊÇ·ñÊ¹ÄÜ$/;"	m	struct:extra_chn_info
+extra_chn_info	vxi11_iioc.h	/^struct extra_chn_info {$/;"	s
+extra_ctx_info	vxi11_iioc.h	/^struct extra_ctx_info {$/;"	s
+extra_dev_info	vxi11_iioc.h	/^struct extra_dev_info {$/;"	s
+input_device	vxi11_iioc.h	/^	bool input_device; \/\/ÊÇ·ñÊÇÊäÈëÉè±¸$/;"	m	struct:extra_dev_info
+nb_attrs	vxi11_iioc.h	/^	unsigned int nb_attrs;$/;"	m	struct:extra_dev_info
+nb_channels	vxi11_iioc.h	/^	unsigned int nb_channels;$/;"	m	struct:extra_dev_info
+nb_devices	vxi11_iioc.h	/^	unsigned int nb_devices;$/;"	m	struct:extra_ctx_info
+offset	vxi11_iioc.h	/^	off_t offset;\/\/Í¨µÀÊý¾Ý´æ´¢¿Õ¼äÆ«ÒÆ$/;"	m	struct:extra_chn_info
+sample_count	vxi11_iioc.h	/^	unsigned int sample_count;\/\/²ÉÑùÊý¾ÝÊýÁ¿$/;"	m	struct:extra_dev_info
+sampling_freq	vxi11_iioc.h	/^	unsigned int sampling_freq;$/;"	m	struct:extra_dev_info
+My_CoreTstQ	vxi11_scpi.c	/^static scpi_result_t My_CoreTstQ(scpi_t * context) {$/;"	f	file:
+PTS_BufferClear	vxi11_scpi.c	/^static scpi_result_t  PTS_BufferClear(scpi_t * context)$/;"	f	file:
+PTS_BufferFetchQ	vxi11_scpi.c	/^static scpi_result_t  PTS_BufferFetchQ(scpi_t * context)$/;"	f	file:
+PTS_BufferSamplingCapture	vxi11_scpi.c	/^static scpi_result_t  PTS_BufferSamplingCapture(scpi_t * context)$/;"	f	file:
+PTS_BufferSamplingSetup	vxi11_scpi.c	/^static scpi_result_t  PTS_BufferSamplingSetup(scpi_t * context)$/;"	f	file:
+PTS_MeasureChannelEnable	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureChannelEnable(scpi_t * context)$/;"	f	file:
+PTS_MeasureChannelEnableQ	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureChannelEnableQ(scpi_t * context)$/;"	f	file:
+PTS_MeasureDutyCycle	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureDutyCycle(scpi_t * context)$/;"	f	file:
+PTS_MeasureDutyCycleQ	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureDutyCycleQ(scpi_t * context)$/;"	f	file:
+PTS_MeasureEnable	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureEnable(scpi_t * context)$/;"	f	file:
+PTS_MeasureEnableQ	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureEnableQ(scpi_t * context)$/;"	f	file:
+PTS_MeasureFrequency	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureFrequency(scpi_t * context)$/;"	f	file:
+PTS_MeasureFrequencyQ	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureFrequencyQ(scpi_t * context)$/;"	f	file:
+PTS_MeasurePeriod	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasurePeriod(scpi_t * context)$/;"	f	file:
+PTS_MeasurePeriodQ	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasurePeriodQ(scpi_t * context)$/;"	f	file:
+PTS_MeasureResistance	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureResistance(scpi_t * context)$/;"	f	file:
+PTS_MeasureResistanceQ	vxi11_scpi.c	/^static scpi_result_t  PTS_MeasureResistanceQ(scpi_t * context)$/;"	f	file:
+SCPI_Control	vxi11_scpi.c	/^scpi_result_t SCPI_Control(scpi_t * context, scpi_ctrl_name_t ctrl, scpi_reg_val_t val) {$/;"	f
+SCPI_Error	vxi11_scpi.c	/^int SCPI_Error(scpi_t * context, int_fast16_t err) {$/;"	f
+SCPI_Flush	vxi11_scpi.c	/^scpi_result_t SCPI_Flush(scpi_t * context) {$/;"	f
+SCPI_INPUT_BUFFER_LENGTH	vxi11_scpi.c	325;"	d	file:
+SCPI_Reset	vxi11_scpi.c	/^scpi_result_t SCPI_Reset(scpi_t * context) {$/;"	f
+SCPI_Write	vxi11_scpi.c	/^size_t SCPI_Write(scpi_t * context, const char * data, size_t len) {$/;"	f
+TEST_ArbQ	vxi11_scpi.c	/^static scpi_result_t TEST_ArbQ(scpi_t * context) {$/;"	f	file:
+TEST_Bool	vxi11_scpi.c	/^static scpi_result_t TEST_Bool(scpi_t * context) {$/;"	f	file:
+TEST_ChoiceQ	vxi11_scpi.c	/^static scpi_result_t TEST_ChoiceQ(scpi_t * context) {$/;"	f	file:
+TEST_Numbers	vxi11_scpi.c	/^static scpi_result_t TEST_Numbers(scpi_t * context) {$/;"	f	file:
+TEST_Text	vxi11_scpi.c	/^static scpi_result_t TEST_Text(scpi_t * context) {$/;"	f	file:
+scpi_commands	vxi11_scpi.c	/^static const scpi_command_t scpi_commands[] = {$/;"	v	file:
+scpi_context	vxi11_scpi.c	/^scpi_t scpi_context = {$/;"	v
+scpi_input_buffer	vxi11_scpi.c	/^static char scpi_input_buffer[SCPI_INPUT_BUFFER_LENGTH];$/;"	v	file:
+scpi_interface	vxi11_scpi.c	/^static scpi_interface_t scpi_interface = {$/;"	v	file:
+scpi_regs	vxi11_scpi.c	/^static scpi_reg_val_t scpi_regs[SCPI_REG_COUNT];$/;"	v	file:
+trigger_source	vxi11_scpi.c	/^scpi_choice_def_t trigger_source[] = {$/;"	v
+__VXI11_SCPI_H__	vxi11_scpi.h	2;"	d
+SIG_PF	vxi11_svc.c	16;"	d	file:
+device_async_1	vxi11_svc.c	/^device_async_1(struct svc_req *rqstp, register SVCXPRT *transp)$/;"	f	file:
+device_core_1	vxi11_svc.c	/^device_core_1(struct svc_req *rqstp, register SVCXPRT *transp)$/;"	f	file:
+device_intr_1	vxi11_svc.c	/^device_intr_1(struct svc_req *rqstp, register SVCXPRT *transp)$/;"	f	file:
+main	vxi11_svc.c	/^main (int argc, char **argv)$/;"	f
+DEVICE_NUM	vxi11_svc_func.c	40;"	d	file:
+Device_Inst	vxi11_svc_func.c	/^struct Device_Inst {$/;"	s	file:
+Device_Inst	vxi11_svc_func.c	/^typedef struct Device_Inst Device_Inst;$/;"	t	typeref:struct:Device_Inst	file:
+MAX_RECV_SIZE	vxi11_svc_func.c	39;"	d	file:
+VXI11_SVC_DEBUG	vxi11_svc_func.c	18;"	d	file:
+VXI11_SVC_DEBUG	vxi11_svc_func.c	20;"	d	file:
+VXI_ABORT	vxi11_svc_func.c	36;"	d	file:
+VXI_CHAN_ALREADY_EATAB	vxi11_svc_func.c	37;"	d	file:
+VXI_CHAN_NOT_ESTAB	vxi11_svc_func.c	28;"	d	file:
+VXI_DEV_LOCK_BY_OTH_LINK	vxi11_svc_func.c	31;"	d	file:
+VXI_DEV_NOT_ACCESS	vxi11_svc_func.c	25;"	d	file:
+VXI_INVALID_ADDR	vxi11_svc_func.c	35;"	d	file:
+VXI_INVALID_LID	vxi11_svc_func.c	26;"	d	file:
+VXI_IO_ERROR	vxi11_svc_func.c	34;"	d	file:
+VXI_IO_TIMEOUT	vxi11_svc_func.c	33;"	d	file:
+VXI_NO_ERROR	vxi11_svc_func.c	23;"	d	file:
+VXI_NO_LOCK_HELD_BY_LINK	vxi11_svc_func.c	32;"	d	file:
+VXI_OP_NOT_SUPPORT	vxi11_svc_func.c	29;"	d	file:
+VXI_OUT_OF_RES	vxi11_svc_func.c	30;"	d	file:
+VXI_PARAM_ERROR	vxi11_svc_func.c	27;"	d	file:
+VXI_SYNTAX_ERROR	vxi11_svc_func.c	24;"	d	file:
+__VXI11_SVC_DEBUG__	vxi11_svc_func.c	16;"	d	file:
+abort	vxi11_svc_func.c	/^	bool_t abort;$/;"	m	struct:Device_Inst	file:
+adc_dev	vxi11_svc_func.c	/^struct iio_device *adc_dev = NULL;$/;"	v	typeref:struct:iio_device
+create_intr_chan_1_svc	vxi11_svc_func.c	/^create_intr_chan_1_svc(Device_RemoteFunc *argp, struct svc_req *rqstp)$/;"	f
+create_link_1_svc	vxi11_svc_func.c	/^create_link_1_svc(Create_LinkParms *argp, struct svc_req *rqstp)$/;"	f
+ctx_info	vxi11_svc_func.c	/^struct extra_ctx_info *ctx_info = NULL;$/;"	v	typeref:struct:extra_ctx_info
+cur_lid	vxi11_svc_func.c	/^static Device_Link cur_lid = 0;$/;"	v	file:
+dInst	vxi11_svc_func.c	/^static Device_Inst dInst[DEVICE_NUM] = {$/;"	v	file:
+dds_dev	vxi11_svc_func.c	/^struct iio_device *dds_dev = NULL;$/;"	v	typeref:struct:iio_device
+destroy_intr_chan_1_svc	vxi11_svc_func.c	/^destroy_intr_chan_1_svc(void *argp, struct svc_req *rqstp)$/;"	f
+destroy_link_1_svc	vxi11_svc_func.c	/^destroy_link_1_svc(Device_Link *argp, struct svc_req *rqstp)$/;"	f
+device_abort_1_svc	vxi11_svc_func.c	/^device_abort_1_svc(Device_Link *argp, struct svc_req *rqstp)$/;"	f
+device_clear_1_svc	vxi11_svc_func.c	/^device_clear_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)$/;"	f
+device_docmd_1_svc	vxi11_svc_func.c	/^device_docmd_1_svc(Device_DocmdParms *argp, struct svc_req *rqstp)$/;"	f
+device_enable_srq_1_svc	vxi11_svc_func.c	/^device_enable_srq_1_svc(Device_EnableSrqParms *argp, struct svc_req *rqstp)$/;"	f
+device_intr_srq_1_svc	vxi11_svc_func.c	/^device_intr_srq_1_svc(Device_SrqParms *argp, struct svc_req *rqstp)$/;"	f
+device_local_1_svc	vxi11_svc_func.c	/^device_local_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)$/;"	f
+device_lock_1_svc	vxi11_svc_func.c	/^device_lock_1_svc(Device_LockParms *argp, struct svc_req *rqstp)$/;"	f
+device_read_1_svc	vxi11_svc_func.c	/^device_read_1_svc(Device_ReadParms *argp, struct svc_req *rqstp)$/;"	f
+device_readstb_1_svc	vxi11_svc_func.c	/^device_readstb_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)$/;"	f
+device_remote_1_svc	vxi11_svc_func.c	/^device_remote_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)$/;"	f
+device_trigger_1_svc	vxi11_svc_func.c	/^device_trigger_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)$/;"	f
+device_unlock_1_svc	vxi11_svc_func.c	/^device_unlock_1_svc(Device_Link *argp, struct svc_req *rqstp)$/;"	f
+device_write_1_svc	vxi11_svc_func.c	/^device_write_1_svc(Device_WriteParms *argp, struct svc_req *rqstp)$/;"	f
+dpot0_dev	vxi11_svc_func.c	/^struct iio_device *dpot0_dev = NULL;$/;"	v	typeref:struct:iio_device
+dpot1_dev	vxi11_svc_func.c	/^struct iio_device *dpot1_dev = NULL;$/;"	v	typeref:struct:iio_device
+dpot2_dev	vxi11_svc_func.c	/^struct iio_device *dpot2_dev = NULL;$/;"	v	typeref:struct:iio_device
+dpot3_dev	vxi11_svc_func.c	/^struct iio_device *dpot3_dev = NULL;$/;"	v	typeref:struct:iio_device
+iioc_destory	vxi11_svc_func.c	/^static void iioc_destory(void)$/;"	f	file:
+iioc_init	vxi11_svc_func.c	/^static int iioc_init(void)$/;"	f	file:
+info	vxi11_svc_func.c	/^	char *info;$/;"	m	struct:Device_Inst	file:
+lid	vxi11_svc_func.c	/^	Device_Link lid;$/;"	m	struct:Device_Inst	file:
+lock	vxi11_svc_func.c	/^	bool_t lock;$/;"	m	struct:Device_Inst	file:
+name	vxi11_svc_func.c	/^	char *name;$/;"	m	struct:Device_Inst	file:
+pairDeviceByLid	vxi11_svc_func.c	/^static int pairDeviceByLid(Device_Link lid)$/;"	f	file:
+pairDeviceByName	vxi11_svc_func.c	/^static int pairDeviceByName(char *name)$/;"	f	file:
+pwm_dev	vxi11_svc_func.c	/^struct iio_device *pwm_dev = NULL;$/;"	v	typeref:struct:iio_device
+resp_data	vxi11_svc_func.c	/^struct RespData resp_data = {$/;"	v	typeref:struct:RespData
+trigger_dev	vxi11_svc_func.c	/^struct iio_device *trigger_dev = NULL;$/;"	v	typeref:struct:iio_device
+vxi11_buffer	vxi11_svc_func.c	/^char vxi11_buffer[RESP_DATA_BUF_SIZE];$/;"	v
+RESP_DATA_BUF_SIZE	vxi11_svc_func.h	4;"	d
+RespData	vxi11_svc_func.h	/^struct RespData {$/;"	s
+__VXI11__SVC_FUNC_H__	vxi11_svc_func.h	2;"	d
+data	vxi11_svc_func.h	/^	char *data;$/;"	m	struct:RespData
+error	vxi11_svc_func.h	/^	int error;$/;"	m	struct:RespData
+len	vxi11_svc_func.h	/^	unsigned int len;$/;"	m	struct:RespData
+xdr_Create_LinkParms	vxi11_xdr.c	/^xdr_Create_LinkParms (XDR *xdrs, Create_LinkParms *objp)$/;"	f
+xdr_Create_LinkResp	vxi11_xdr.c	/^xdr_Create_LinkResp (XDR *xdrs, Create_LinkResp *objp)$/;"	f
+xdr_Device_AddrFamily	vxi11_xdr.c	/^xdr_Device_AddrFamily (XDR *xdrs, Device_AddrFamily *objp)$/;"	f
+xdr_Device_DocmdParms	vxi11_xdr.c	/^xdr_Device_DocmdParms (XDR *xdrs, Device_DocmdParms *objp)$/;"	f
+xdr_Device_DocmdResp	vxi11_xdr.c	/^xdr_Device_DocmdResp (XDR *xdrs, Device_DocmdResp *objp)$/;"	f
+xdr_Device_EnableSrqParms	vxi11_xdr.c	/^xdr_Device_EnableSrqParms (XDR *xdrs, Device_EnableSrqParms *objp)$/;"	f
+xdr_Device_Error	vxi11_xdr.c	/^xdr_Device_Error (XDR *xdrs, Device_Error *objp)$/;"	f
+xdr_Device_ErrorCode	vxi11_xdr.c	/^xdr_Device_ErrorCode (XDR *xdrs, Device_ErrorCode *objp)$/;"	f
+xdr_Device_Flags	vxi11_xdr.c	/^xdr_Device_Flags (XDR *xdrs, Device_Flags *objp)$/;"	f
+xdr_Device_GenericParms	vxi11_xdr.c	/^xdr_Device_GenericParms (XDR *xdrs, Device_GenericParms *objp)$/;"	f
+xdr_Device_Link	vxi11_xdr.c	/^xdr_Device_Link (XDR *xdrs, Device_Link *objp)$/;"	f
+xdr_Device_LockParms	vxi11_xdr.c	/^xdr_Device_LockParms (XDR *xdrs, Device_LockParms *objp)$/;"	f
+xdr_Device_ReadParms	vxi11_xdr.c	/^xdr_Device_ReadParms (XDR *xdrs, Device_ReadParms *objp)$/;"	f
+xdr_Device_ReadResp	vxi11_xdr.c	/^xdr_Device_ReadResp (XDR *xdrs, Device_ReadResp *objp)$/;"	f
+xdr_Device_ReadStbResp	vxi11_xdr.c	/^xdr_Device_ReadStbResp (XDR *xdrs, Device_ReadStbResp *objp)$/;"	f
+xdr_Device_RemoteFunc	vxi11_xdr.c	/^xdr_Device_RemoteFunc (XDR *xdrs, Device_RemoteFunc *objp)$/;"	f
+xdr_Device_SrqParms	vxi11_xdr.c	/^xdr_Device_SrqParms (XDR *xdrs, Device_SrqParms *objp)$/;"	f
+xdr_Device_WriteParms	vxi11_xdr.c	/^xdr_Device_WriteParms (XDR *xdrs, Device_WriteParms *objp)$/;"	f
+xdr_Device_WriteResp	vxi11_xdr.c	/^xdr_Device_WriteResp (XDR *xdrs, Device_WriteResp *objp)$/;"	f

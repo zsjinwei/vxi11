@@ -11,31 +11,8 @@
 #include "string.h"
 #include "vxi11_iioc.h"
 #include "vxi11_scpi.h"
+#include "vxi11_svc_func.h"
 
-#define __VXI11_SVC_DEBUG__
-#ifdef __VXI11_SVC_DEBUG__
-#define VXI11_SVC_DEBUG(format,...) printf(format, ##__VA_ARGS__)
-#else
-#define VXI11_SVC_DEBUG(format,...)
-#endif
-
-#define VXI_NO_ERROR				0
-#define VXI_SYNTAX_ERROR			1
-#define VXI_DEV_NOT_ACCESS			3
-#define VXI_INVALID_LID				4
-#define VXI_PARAM_ERROR				5
-#define VXI_CHAN_NOT_ESTAB			6
-#define VXI_OP_NOT_SUPPORT			8
-#define VXI_OUT_OF_RES				9
-#define VXI_DEV_LOCK_BY_OTH_LINK	11
-#define VXI_NO_LOCK_HELD_BY_LINK	12
-#define VXI_IO_TIMEOUT				15
-#define VXI_IO_ERROR				17
-#define VXI_INVALID_ADDR			21
-#define VXI_ABORT					23
-#define VXI_CHAN_ALREADY_EATAB		29
-
-#define MAX_RECV_SIZE 1024
 #define DEVICE_NUM 1
 static Device_Link cur_lid = 0;
 
@@ -48,22 +25,20 @@ struct Device_Inst {
 };
 typedef struct Device_Inst Device_Inst;
 
+Device_ReadResp read_resp;
+
+char vxi11_buffer[RESP_DATA_BUF_SIZE];
+
 // === iio struct ===
 struct extra_ctx_info *ctx_info = NULL;
 struct iio_device *adc_dev = NULL;
 struct iio_device *pwm_dev = NULL;
 struct iio_device *trigger_dev = NULL;
 struct iio_device *dds_dev = NULL;
-struct iio_device *apot_dev = NULL;
-
-const char *adc_name = "ad7606";
-const char *trigger_name = "irqtrig37";
-const char *pwm_name = "pwm0";
-const char *dds_name = "ad9854";
-const char *apot0_name = "ad5235.0";
-const char *apot1_name = "ad5235.1";
-const char *apot2_name = "ad5235.2";
-const char *apot3_name = "ad5235.3";
+struct iio_device *dpot0_dev = NULL;
+struct iio_device *dpot1_dev = NULL;
+struct iio_device *dpot2_dev = NULL;
+struct iio_device *dpot3_dev = NULL;
 // =======end========
 
 static Device_Inst dInst[DEVICE_NUM] = {
@@ -126,19 +101,19 @@ static int iioc_init(void)
 	}
 
 	if (!adc_dev) {
-		adc_dev = iioc_dev_open(ctx_info, adc_name);
+		adc_dev = iioc_dev_open(ctx_info, ADC_NAME);
 		if (!adc_dev) {
 			return -ENXIO;
 		}
 	}
 	if (!trigger_dev) {
-		trigger_dev = iioc_dev_open(ctx_info, trigger_name);
+		trigger_dev = iioc_dev_open(ctx_info, TRIGGER_NAME);
 		if (!trigger_dev) {
 			return -ENXIO;
 		}
 	}
 	if (!pwm_dev) {
-		pwm_dev = iioc_dev_open(ctx_info, pwm_name);
+		pwm_dev = iioc_dev_open(ctx_info, PWM_NAME);
 		if (!pwm_dev) {
 			return -ENXIO;
 		}
@@ -223,6 +198,24 @@ create_link_1_svc(Create_LinkParms *argp, struct svc_req *rqstp)
 			dInst[DevIdx].lock == 1;
 		}
 	}
+
+	if (!resp_data.data.data_val) {
+		resp_data.reason = 0x04;
+		resp_data.error = VXI_IO_ERROR;
+		resp_data.data.data_len = 0;
+		resp_data.data.data_val = vxi11_buffer;
+	}
+
+	// malloc data buffer memory
+	// if (!resp_data.data) {
+	// 	resp_data.len = 0;
+	// 	resp_data.data = (char *)malloc(RESP_DATA_BUF_SIZE, sizeof(char));
+	// 	if (!resp_data.data) {
+	// 		VXI11_SVC_DEBUG("malloc resp data buffer memory error.\n");
+	// 		result.error = VXI_DEV_NOT_ACCESS;
+	// 		return &result;
+	// 	}
+	// }
 
 	if (iioc_init()) {
 		result.error = VXI_DEV_NOT_ACCESS;
