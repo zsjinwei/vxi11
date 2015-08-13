@@ -5,12 +5,173 @@
  */
 
 #include "vxi11.h"
+#include "stdio.h"
+#include <errno.h>
+#include <unistd.h>
+#include "string.h"
+#include "vxi11_iioc.h"
+#include "vxi11_scpi.h"
+
+#define __VXI11_SVC_DEBUG__
+#ifdef __VXI11_SVC_DEBUG__
+#define VXI11_SVC_DEBUG(format,...) printf(format, ##__VA_ARGS__)
+#else
+#define VXI11_SVC_DEBUG(format,...)
+#endif
+
+#define VXI_NO_ERROR				0
+#define VXI_SYNTAX_ERROR			1
+#define VXI_DEV_NOT_ACCESS			3
+#define VXI_INVALID_LID				4
+#define VXI_PARAM_ERROR				5
+#define VXI_CHAN_NOT_ESTAB			6
+#define VXI_OP_NOT_SUPPORT			8
+#define VXI_OUT_OF_RES				9
+#define VXI_DEV_LOCK_BY_OTH_LINK	11
+#define VXI_NO_LOCK_HELD_BY_LINK	12
+#define VXI_IO_TIMEOUT				15
+#define VXI_IO_ERROR				17
+#define VXI_INVALID_ADDR			21
+#define VXI_ABORT					23
+#define VXI_CHAN_ALREADY_EATAB		29
+
+#define MAX_RECV_SIZE 1024
+#define DEVICE_NUM 1
+static Device_Link cur_lid = 0;
+
+struct Device_Inst {
+	Device_Link lid;
+	bool_t lock;
+	bool_t abort;
+	char *name;
+	char *info;
+};
+typedef struct Device_Inst Device_Inst;
+
+// === iio struct ===
+struct extra_ctx_info *ctx_info = NULL;
+struct iio_device *adc_dev = NULL;
+struct iio_device *pwm_dev = NULL;
+struct iio_device *trigger_dev = NULL;
+struct iio_device *dds_dev = NULL;
+struct iio_device *apot_dev = NULL;
+
+const char *adc_name = "ad7606";
+const char *trigger_name = "irqtrig37";
+const char *pwm_name = "pwm0";
+const char *dds_name = "ad9854";
+const char *apot0_name = "ad5235.0";
+const char *apot1_name = "ad5235.1";
+const char *apot2_name = "ad5235.2";
+const char *apot3_name = "ad5235.3";
+// =======end========
+
+static Device_Inst dInst[DEVICE_NUM] = {
+	[0] = {
+		.lid = 0,
+		.lock = 0,
+		.abort = 0,
+		.name = "inst0",
+		.info = "SYSU,HJW1,2015-05-27,0.0.1"
+	}
+};
+
+static int pairDeviceByName(char *name)
+{
+	int i;
+	for (i = 0; i < DEVICE_NUM; i++)
+	{
+		if (strcmp(name, dInst[i].name) == 0) //pair the device by name
+		{
+			break;
+		}
+		else
+		{
+			if (i == DEVICE_NUM - 1) //can not pair any device
+			{
+				return -1;
+			}
+		}
+	}
+	return i;
+}
+
+static int pairDeviceByLid(Device_Link lid)
+{
+	int i;
+	for (i = 0; i < DEVICE_NUM; i++)
+	{
+		if (lid == dInst[i].lid) //pair the device by lid
+		{
+			break;
+		}
+		else
+		{
+			if (i == DEVICE_NUM - 1) //can not pair any device
+			{
+				return -1;
+			}
+		}
+	}
+	return i;
+}
+
+static int iioc_init(void)
+{
+	if (!ctx_info) {
+		ctx_info = iioc_ctx_open();
+		if (!ctx_info) {
+			return -ENXIO;
+		}
+	}
+
+	if (!adc_dev) {
+		adc_dev = iioc_dev_open(ctx_info, adc_name);
+		if (!adc_dev) {
+			return -ENXIO;
+		}
+	}
+	if (!trigger_dev) {
+		trigger_dev = iioc_dev_open(ctx_info, trigger_name);
+		if (!trigger_dev) {
+			return -ENXIO;
+		}
+	}
+	if (!pwm_dev) {
+		pwm_dev = iioc_dev_open(ctx_info, pwm_name);
+		if (!pwm_dev) {
+			return -ENXIO;
+		}
+	}
+
+	return 0;
+}
+
+static void iioc_destory(void)
+{
+	if (pwm_dev) {
+		iioc_dev_close(pwm_dev);
+		pwm_dev = NULL;
+	}
+	if (trigger_dev) {
+		iioc_dev_close(trigger_dev);
+		trigger_dev = NULL;
+	}
+	if (adc_dev) {
+		iioc_dev_close(adc_dev);
+		adc_dev = NULL;
+	}
+	if (ctx_info) {
+		iioc_ctx_close(ctx_info);
+		ctx_info = NULL;
+	}
+}
 
 Device_Error *
 device_abort_1_svc(Device_Link *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("device_abort_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -22,11 +183,58 @@ Create_LinkResp *
 create_link_1_svc(Create_LinkParms *argp, struct svc_req *rqstp)
 {
 	static Create_LinkResp  result;
+	static pt = 0;
+	int DevIdx;
+	VXI11_SVC_DEBUG("create_link_1_svc: clientId:%d,lockDevice:%d,lock_timeout:%d,device:%s.\n", argp->clientId, argp->lockDevice, argp->lock_timeout, argp->device);
 
-	/*
-	 * insert server code here
-	 */
+	DevIdx = pairDeviceByName(argp->device);
+	if (DevIdx >= 0)
+	{
+		if (dInst[DevIdx].lid != 0) //check whether the device is use by another link
+		{
+			//result.error = VXI_OUT_OF_RES;  //return error: out of resource
+			//return &result;
+		}
+	}
+	else
+	{
+		result.error = VXI_DEV_NOT_ACCESS;  //return error: device not accessible
+		return &result;
+	}
 
+	if (argp->lockDevice == 1)
+	{
+		//lock the device
+		if (dInst[DevIdx].lock == 1) //TODO: multiple thread
+		{
+			usleep(argp->lock_timeout);  //wait unlock
+			if (dInst[DevIdx].lock == 1)
+			{
+				result.error = VXI_DEV_LOCK_BY_OTH_LINK;
+				return &result;
+			}
+			else
+			{
+				dInst[DevIdx].lock == 1;
+			}
+		}
+		else
+		{
+			dInst[DevIdx].lock == 1;
+		}
+	}
+
+	if (iioc_init()) {
+		result.error = VXI_DEV_NOT_ACCESS;
+		return &result;
+	}
+
+	dInst[DevIdx].lid = ++cur_lid;
+	result.error = VXI_NO_ERROR;
+	result.lid = dInst[DevIdx].lid;
+	result.abortPort = 0;
+	result.maxRecvSize = MAX_RECV_SIZE;
+	VXI11_SVC_DEBUG("CreateLink Result: error:%d,lid:%d,abortPort:%d,maxRecvSize:%d.\n", result.error, result.lid, result.abortPort, result.maxRecvSize);
 	return &result;
 }
 
@@ -34,11 +242,35 @@ Device_WriteResp *
 device_write_1_svc(Device_WriteParms *argp, struct svc_req *rqstp)
 {
 	static Device_WriteResp  result;
+	int DevIdx;
+	VXI11_SVC_DEBUG("device_write_1_svc: Device_Link:%d,io_timeout:%d,lock_timeout:%d,flags:%d,data_len:%d.\n",
+	                argp->lid, argp->io_timeout, argp->lock_timeout, argp->flags, argp->data.data_len);
 
-	/*
-	 * insert server code here
-	 */
+	//check lid
+	DevIdx = pairDeviceByLid(argp->lid);
+	if (DevIdx < 0)
+	{
+		result.error = VXI_INVALID_LID;
+		return &result;
+	}
 
+	if (argp->data.data_len > MAX_RECV_SIZE)
+	{
+		result.error = VXI_PARAM_ERROR;
+		return &result;
+	}
+
+	if (strncmp(argp->data.data_val, "*IDN?", 5) == 0 || strncmp(argp->data.data_val, "*idn?", 5) == 0 )
+	{
+		VXI11_SVC_DEBUG("Receive: %s.\n", argp->data.data_val);
+	}
+	else
+	{
+		result.error = VXI_PARAM_ERROR;
+		return &result;
+	}
+	result.error = VXI_NO_ERROR;
+	result.size = argp->data.data_len;
 	return &result;
 }
 
@@ -46,11 +278,20 @@ Device_ReadResp *
 device_read_1_svc(Device_ReadParms *argp, struct svc_req *rqstp)
 {
 	static Device_ReadResp  result;
+	int DevIdx;
+	VXI11_SVC_DEBUG("device_read_1_svc.\n");
 
-	/*
-	 * insert server code here
-	 */
-
+	//check lid
+	DevIdx = pairDeviceByLid(argp->lid);
+	if (DevIdx < 0)
+	{
+		result.error = VXI_INVALID_LID;
+		return &result;
+	}
+	result.reason = 0x04;
+	result.error = VXI_NO_ERROR;
+	result.data.data_len = strlen(dInst[DevIdx].info);
+	result.data.data_val = dInst[DevIdx].info;
 	return &result;
 }
 
@@ -58,11 +299,11 @@ Device_ReadStbResp *
 device_readstb_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)
 {
 	static Device_ReadStbResp  result;
-
+	VXI11_SVC_DEBUG("device_readstb_1_svc\n");
 	/*
 	 * insert server code here
 	 */
-
+	result.error = 8;
 	return &result;
 }
 
@@ -70,7 +311,7 @@ Device_Error *
 device_trigger_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("device_trigger_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -82,7 +323,7 @@ Device_Error *
 device_clear_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("device_clear_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -94,7 +335,7 @@ Device_Error *
 device_remote_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("device_remote_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -106,7 +347,7 @@ Device_Error *
 device_local_1_svc(Device_GenericParms *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("device_local_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -118,7 +359,7 @@ Device_Error *
 device_lock_1_svc(Device_LockParms *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("device_lock_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -130,7 +371,7 @@ Device_Error *
 device_unlock_1_svc(Device_Link *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("device_unlock_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -142,7 +383,7 @@ Device_Error *
 device_enable_srq_1_svc(Device_EnableSrqParms *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("device_enable_srq_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -154,7 +395,7 @@ Device_DocmdResp *
 device_docmd_1_svc(Device_DocmdParms *argp, struct svc_req *rqstp)
 {
 	static Device_DocmdResp  result;
-
+	VXI11_SVC_DEBUG("device_docmd_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -166,11 +407,27 @@ Device_Error *
 destroy_link_1_svc(Device_Link *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
-	/*
-	 * insert server code here
-	 */
-
+	int i;
+	VXI11_SVC_DEBUG("destroy_link_1_svc: Device_Link:%d\n", *argp);
+	for (i = 0; i < DEVICE_NUM; i++)
+	{
+		if ((*argp) == dInst[i].lid) //pair the device by name
+		{
+			dInst[i].lid = 0;
+			dInst[i].lock = 0;
+			break;
+		}
+		else
+		{
+			if (i == DEVICE_NUM - 1)
+			{
+				result.error = 4;
+				return &result;
+			}
+		}
+	}
+	iioc_destory();
+	result.error = 0;
 	return &result;
 }
 
@@ -178,7 +435,7 @@ Device_Error *
 create_intr_chan_1_svc(Device_RemoteFunc *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("create_intr_chan_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -190,7 +447,7 @@ Device_Error *
 destroy_intr_chan_1_svc(void *argp, struct svc_req *rqstp)
 {
 	static Device_Error  result;
-
+	VXI11_SVC_DEBUG("destroy_intr_chan_1_svc\n");
 	/*
 	 * insert server code here
 	 */
@@ -202,7 +459,7 @@ void *
 device_intr_srq_1_svc(Device_SrqParms *argp, struct svc_req *rqstp)
 {
 	static char * result;
-
+	VXI11_SVC_DEBUG("device_intr_srq_1_svc\n");
 	/*
 	 * insert server code here
 	 */
