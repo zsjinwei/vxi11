@@ -48,44 +48,63 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
 	return SCPI_RES_OK;
 }
 
+/**
+ * [PTS_MeasureChannelEnableQ description]
+ * @param  context [description]
+ * @return         [description]
+ */
 static scpi_result_t  PTS_MeasureChannelEnableQ(scpi_t * context)
 {
 	int32_t chn_idx;
 	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
 	if (!adc_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", ADC_NAME);
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	unsigned int nb_channels = iio_device_get_channels_count(adc_dev);
 	SCPI_CommandNumbers(context, &chn_idx, 1);
 	if (nb_channels == 0 || nb_channels < chn_idx || chn_idx < 0) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	struct iio_channel *chn = iio_device_get_channel(adc_dev, chn_idx);
 	if (!chn) {
+		SCPI_DBG("get channel-%d error.\n", chn_idx);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	if (iio_channel_is_enabled (chn)) {
+		SCPI_DBG("channel-%d is enable.\n", chn_idx);
 		read_resp.error = VXI_NO_ERROR;
 		read_resp.data.data_len = 2;
 		strcpy(read_resp.data.data_val, "1");
 	}
 	else {
+		SCPI_DBG("channel-%d is disable.\n", chn_idx);
 		read_resp.error = VXI_NO_ERROR;
 		read_resp.data.data_len = 2;
 		strcpy(read_resp.data.data_val, "0");
 	}
-
+	write_resp.error = VXI_NO_ERROR;
 	return SCPI_RES_OK;
 }
 
+/**
+ * [PTS_MeasureEnableQ description]
+ * @param  context [description]
+ * @return         [description]
+ */
 static scpi_result_t  PTS_MeasureEnableQ(scpi_t * context)
 {
 	int ret = 0;
 	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
 	if (!pwm_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", PWM_NAME);
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
@@ -93,9 +112,11 @@ static scpi_result_t  PTS_MeasureEnableQ(scpi_t * context)
 	if (ret > 0) {
 		read_resp.error = VXI_NO_ERROR;
 		read_resp.data.data_len = ret;
+		write_resp.error = VXI_NO_ERROR;
 		return SCPI_RES_OK;
 	}
 	else {
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 }
@@ -105,6 +126,11 @@ static scpi_result_t  PTS_MeasureResistanceQ(scpi_t * context)
 	return SCPI_RES_OK;
 }
 
+/**
+ * [PTS_MeasureFrequencyQ description]
+ * @param  context [description]
+ * @return         [description]
+ */
 static scpi_result_t  PTS_MeasureFrequencyQ(scpi_t * context)
 {
 	char rw_buf[30];
@@ -113,6 +139,8 @@ static scpi_result_t  PTS_MeasureFrequencyQ(scpi_t * context)
 	unsigned int freq;
 	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
 	if (!pwm_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", PWM_NAME);
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
@@ -121,6 +149,8 @@ static scpi_result_t  PTS_MeasureFrequencyQ(scpi_t * context)
 		period = atoi(rw_buf);
 	}
 	else {
+		SCPI_DBG("IIOC: read attr %s error, return %d.\n", PWM_ATTR_PERIOD, ret);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 	if (period <= 0) {
@@ -129,13 +159,16 @@ static scpi_result_t  PTS_MeasureFrequencyQ(scpi_t * context)
 	else {
 		freq = (unsigned int)((1.0 / period) * 1000000000.0);
 	}
+	SCPI_DBG("Read from %s: period=%d, frequency=%d.\n", PWM_NAME, period, freq);
 	ret = sprintf(read_resp.data.data_val, "%d", freq);
 	if (ret > 0) {
 		read_resp.error = VXI_NO_ERROR;
 		read_resp.data.data_len = ret;
+		write_resp.error = VXI_NO_ERROR;
 		return SCPI_RES_OK;
 	}
 	else {
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 }
@@ -198,12 +231,26 @@ static scpi_result_t  PTS_MeasureDutyCycleQ(scpi_t * context)
 	}
 }
 
+/**
+ * [PTS_ConfigureChannelEnable description]
+ * @param  context [description]
+ * @return         [description]
+ */
 static scpi_result_t  PTS_ConfigureChannelEnable(scpi_t * context)
 {
 	int32_t chn_idx;
 	scpi_bool_t chn_enable;
+
+	// read first parameter if present
+	if (!SCPI_ParamBool(context, &chn_enable, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
+
 	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
 	if (!adc_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", ADC_NAME);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
@@ -211,58 +258,71 @@ static scpi_result_t  PTS_ConfigureChannelEnable(scpi_t * context)
 	// read channel index
 	SCPI_CommandNumbers(context, &chn_idx, 1);
 	if (nb_channels == 0 || nb_channels < chn_idx || chn_idx < 0) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	struct iio_channel *chn = iio_device_get_channel(adc_dev, chn_idx);
 	if (!chn) {
+		SCPI_DBG("get channel-%d error.\n", chn_idx);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 	struct extra_chn_info *chn_info = iio_channel_get_data(chn);
 	if (!chn_info) {
-		return SCPI_RES_ERR;
-	}
-	else {
-		chn_info->enabled = 1;
-	}
-	// read first parameter if present
-	if (!SCPI_ParamBool(context, &chn_enable, TRUE)) {
+		SCPI_DBG("get channel-%d info data error.\n", chn_idx);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	if (chn_enable) {
+		SCPI_DBG("Enable CH%d.\n", chn_idx);
 		iio_channel_enable(chn);
+		chn_info->enabled = 1;
 	}
 	else {
+		SCPI_DBG("Disable CH%d.\n", chn_idx);
 		iio_channel_disable(chn);
+		chn_info->enabled = 0;
 	}
+	write_resp.error = VXI_NO_ERROR;
 	return SCPI_RES_OK;
 }
 
+/**
+ * [PTS_ConfigureEnable description]
+ * @param  context [description]
+ * @return         [description]
+ */
 static scpi_result_t  PTS_ConfigureEnable(scpi_t * context)
 {
 	int ret = 0;
-	scpi_bool_t meas_enable;
+	scpi_bool_t conf_enable;
 	// read first parameter if present
-	if (!SCPI_ParamBool(context, &meas_enable, TRUE)) {
+	if (!SCPI_ParamBool(context, &conf_enable, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
 	if (!pwm_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", PWM_NAME);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
-	if (meas_enable) {
+	if (conf_enable) {
 		ret = iioc_write_attr(pwm_dev, PWM_ATTR_ENABLE, "1");
 	}
 	else {
 		ret = iioc_write_attr(pwm_dev, PWM_ATTR_ENABLE, "0");
 	}
-	if (!ret) {
+	if (ret > 0) {
+		write_resp.error = VXI_NO_ERROR;
 		return SCPI_RES_OK;
 	}
 	else {
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 }
@@ -272,6 +332,11 @@ static scpi_result_t  PTS_ConfigureResistance(scpi_t * context)
 	return SCPI_RES_OK;
 }
 
+/**
+ * [PTS_ConfigureFrequency description]
+ * @param  context [description]
+ * @return         [description]
+ */
 static scpi_result_t  PTS_ConfigureFrequency(scpi_t * context)
 {
 	int ret = 0;
@@ -281,43 +346,54 @@ static scpi_result_t  PTS_ConfigureFrequency(scpi_t * context)
 	scpi_number_t freq_t;
 	// read first parameter if present
 	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &freq_t, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 	if (freq_t.value <= 0.0) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
 	if (!pwm_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", PWM_NAME);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	period = (unsigned int)((1.0 / freq_t.value) * 1000000000.0);
 	duty_cycle = period / 2;
 
+	SCPI_DBG("write to %s: period=%d, duty_cycle=%d.\n", PWM_NAME, period, duty_cycle);
 	ret = sprintf(rw_buf, "%u", period);
 	if (ret > 0) {
+		ret = iioc_write_attr(pwm_dev, PWM_ATTR_DUTY_CYCLE, "0");
 		ret = iioc_write_attr(pwm_dev, PWM_ATTR_PERIOD, rw_buf);
-		if (ret) {
+		if (ret <= 0) {
+			write_resp.error = VXI_IO_ERROR;
 			return SCPI_RES_ERR;
 		}
 		else {
 			ret = sprintf(rw_buf, "%u", duty_cycle);
 			if (ret > 0) {
 				ret = iioc_write_attr(pwm_dev, PWM_ATTR_DUTY_CYCLE, rw_buf);
-				if (ret) {
+				if (ret <= 0) {
+					write_resp.error = VXI_IO_ERROR;
 					return SCPI_RES_ERR;
 				}
 				else {
+					write_resp.error = VXI_NO_ERROR;
 					return SCPI_RES_OK;
 				}
 			}
 			else {
+				write_resp.error = VXI_IO_ERROR;
 				return SCPI_RES_ERR;
 			}
 		}
 	}
 	else {
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 }
@@ -443,22 +519,36 @@ static scpi_result_t  PTS_BufferSamplingSetup(scpi_t * context)
 	scpi_number_t sampling_freq_t, sample_count_t;
 	// read first parameter if present
 	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &sampling_freq_t, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	// read second paraeter if present
 	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &sample_count_t, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
+
+	if (sampling_freq_t.value <= 0.0 || sample_count_t.value <= 0.0) {
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
+
 	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
 	struct iio_device *trigger_dev = iio_context_find_device(ctx_info->ctx, TRIGGER_NAME);
 	if ((!adc_dev) || (!trigger_dev)) {
+		SCPI_DBG("Cannot find %s or %s.\n", ADC_NAME, TRIGGER_NAME);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
+
+	SCPI_DBG("Sampling Setup: sampling_freq=%f, sample_count=%f.\n", sampling_freq_t.value, sample_count_t.value);
 	ret = iioc_sampling_setup(adc_dev, trigger_dev, sampling_freq_t.value, sample_count_t.value);
 	if (ret) {
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
+	write_resp.error = VXI_NO_ERROR;
 	return SCPI_RES_OK;
 }
 
@@ -466,19 +556,29 @@ static scpi_result_t  PTS_BufferSamplingCapture(scpi_t * context)
 {
 	int ret = 0;
 	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
-	ret = iioc_sampling_capture(adc_dev);
-	if (ret) {
+	if (!adc_dev) {
+		SCPI_DBG("IIOC: Cannot find device %s.\n", ADC_NAME);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
+	SCPI_DBG("Samplint start.\n");
+	ret = iioc_sampling_capture(adc_dev);
+	if (ret) {
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+	write_resp.error = VXI_NO_ERROR;
 	return SCPI_RES_OK;
 }
 
 static scpi_result_t  PTS_BufferFetchQ(scpi_t * context)
 {
 	int32_t chn_idx;
-	scpi_bool_t chn_enable;
+	bool chn_enable;
 	struct iio_device *adc_dev = iio_context_find_device(ctx_info->ctx, ADC_NAME);
 	if (!adc_dev) {
+		SCPI_DBG("IIOC: Cannot find device %s.\n", ADC_NAME);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
@@ -486,23 +586,30 @@ static scpi_result_t  PTS_BufferFetchQ(scpi_t * context)
 	// read channel index
 	SCPI_CommandNumbers(context, &chn_idx, 1);
 	if (nb_channels == 0 || nb_channels < chn_idx || chn_idx < 0) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	struct iio_channel *chn = iio_device_get_channel(adc_dev, chn_idx);
 	if (!chn) {
+		SCPI_DBG("Cannot get CH%d.\n", chn_idx);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	struct extra_chn_info *chn_info = iio_channel_get_data(chn);
 	if (!chn_info)
 	{
+		SCPI_DBG("Cannot get CH%d info data.\n", chn_idx);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	memcpy((char *)read_resp.data.data_val, (char *)chn_info->data_ref, chn_info->offset * 2);
 	read_resp.error = VXI_NO_ERROR;
 	read_resp.data.data_len = chn_info->offset * 2;
+	SCPI_DBG("get %d bytes data from CH%d.\n", read_resp.data.data_len, chn_idx);
+	write_resp.error = VXI_NO_ERROR;
 	return SCPI_RES_OK;
 }
 

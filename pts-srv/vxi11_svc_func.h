@@ -1,7 +1,7 @@
 #ifndef __VXI11__SVC_FUNC_H__
 #define __VXI11__SVC_FUNC_H__
 
-#define RESP_DATA_BUF_SIZE 2000
+#define RESP_DATA_BUF_SIZE 3000
 
 #define __VXI11_SVC_DEBUG__
 #ifdef __VXI11_SVC_DEBUG__
