@@ -1,6 +1,7 @@
 #include "vxi11.h"
 #include "vxi11_scpi.h"
 #include "vxi11_iioc.h"
+#include "vxi11_svc_func.h"
 
 // === iio struct ===
 extern struct extra_ctx_info *ctx_info;
@@ -15,6 +16,7 @@ extern struct iio_device *dpot3_dev;
 // =======end========
 
 extern Device_ReadResp read_resp;
+extern Device_WriteResp write_resp;
 
 size_t SCPI_Write(scpi_t * context, const char * data, size_t len) {
 	(void) context;
@@ -66,14 +68,14 @@ static scpi_result_t  PTS_MeasureChannelEnableQ(scpi_t * context)
 	}
 
 	if (iio_channel_is_enabled (chn)) {
-		resp_data.error = VXI_NO_ERROR;
-		resp_data.data.data_len = 2;
-		strcpy(resp_data.data.data_val, "1");
+		read_resp.error = VXI_NO_ERROR;
+		read_resp.data.data_len = 2;
+		strcpy(read_resp.data.data_val, "1");
 	}
 	else {
-		resp_data.error = VXI_NO_ERROR;
-		resp_data.data.data_len = 2;
-		strcpy(resp_data.data.data_val, "0");
+		read_resp.error = VXI_NO_ERROR;
+		read_resp.data.data_len = 2;
+		strcpy(read_resp.data.data_val, "0");
 	}
 
 	return SCPI_RES_OK;
@@ -87,10 +89,10 @@ static scpi_result_t  PTS_MeasureEnableQ(scpi_t * context)
 		return SCPI_RES_ERR;
 	}
 
-	ret = iioc_read_attr(pwm_dev, PWM_ATTR_ENABLE, resp_data.data.data_val);
+	ret = iioc_read_attr(pwm_dev, PWM_ATTR_ENABLE, read_resp.data.data_val);
 	if (ret > 0) {
-		resp_data.error = VXI_NO_ERROR;
-		resp_data.data.data_len = ret;
+		read_resp.error = VXI_NO_ERROR;
+		read_resp.data.data_len = ret;
 		return SCPI_RES_OK;
 	}
 	else {
@@ -127,10 +129,10 @@ static scpi_result_t  PTS_MeasureFrequencyQ(scpi_t * context)
 	else {
 		freq = (unsigned int)((1.0 / period) * 1000000000.0);
 	}
-	ret = sprintf(resp_data.data.data_val, "%d", freq);
+	ret = sprintf(read_resp.data.data_val, "%d", freq);
 	if (ret > 0) {
-		resp_data.error = VXI_NO_ERROR;
-		resp_data.data.data_len = ret;
+		read_resp.error = VXI_NO_ERROR;
+		read_resp.data.data_len = ret;
 		return SCPI_RES_OK;
 	}
 	else {
@@ -138,45 +140,65 @@ static scpi_result_t  PTS_MeasureFrequencyQ(scpi_t * context)
 	}
 }
 
+/**
+ * [PTS_MeasurePeriodQ description]
+ * @param  context [description]
+ * @return         [description]
+ */
 static scpi_result_t  PTS_MeasurePeriodQ(scpi_t * context)
 {
 	int ret = 0;
 	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
 	if (!pwm_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", PWM_NAME);
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
-	ret = iioc_read_attr(pwm_dev, PWM_ATTR_PERIOD, resp_data.data.data_val);
+	ret = iioc_read_attr(pwm_dev, PWM_ATTR_PERIOD, read_resp.data.data_val);
 	if (ret > 0) {
-		resp_data.error = VXI_NO_ERROR;
-		resp_data.data.data_len = ret;
+		read_resp.error = VXI_NO_ERROR;
+		read_resp.data.data_len = ret;
+		write_resp.error = VXI_NO_ERROR;
 		return SCPI_RES_OK;
 	}
 	else {
+		SCPI_DBG("IIOC: read attr %s error, return %d.\n", PWM_ATTR_PERIOD, ret);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 }
 
+/**
+ * [PTS_MeasureDutyCycleQ description]
+ * @param  context [description]
+ * @return         [description]
+ */
 static scpi_result_t  PTS_MeasureDutyCycleQ(scpi_t * context)
 {
 	int ret = 0;
 	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
 	if (!pwm_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", PWM_NAME);
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 
-	ret = iioc_read_attr(pwm_dev, PWM_ATTR_DUTY_CYCLE, resp_data.data.data_val);
+	ret = iioc_read_attr(pwm_dev, PWM_ATTR_DUTY_CYCLE, read_resp.data.data_val);
 	if (ret > 0) {
-		resp_data.error = VXI_NO_ERROR;
-		resp_data.data.data_len = ret;
+		read_resp.error = VXI_NO_ERROR;
+		read_resp.data.data_len = ret;
+		write_resp.error = VXI_NO_ERROR;
 		return SCPI_RES_OK;
 	}
 	else {
+		SCPI_DBG("IIOC: read attr %s error, return %d.\n", PWM_ATTR_DUTY_CYCLE, ret);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 }
 
-static scpi_result_t  PTS_MeasureChannelEnable(scpi_t * context)
+static scpi_result_t  PTS_ConfigureChannelEnable(scpi_t * context)
 {
 	int32_t chn_idx;
 	scpi_bool_t chn_enable;
@@ -196,12 +218,12 @@ static scpi_result_t  PTS_MeasureChannelEnable(scpi_t * context)
 	if (!chn) {
 		return SCPI_RES_ERR;
 	}
-	struct extra_chn_info *chn_info = iio_channel_get_data(ch);
+	struct extra_chn_info *chn_info = iio_channel_get_data(chn);
 	if (!chn_info) {
 		return SCPI_RES_ERR;
 	}
 	else {
-		chn_info->enable = 1;
+		chn_info->enabled = 1;
 	}
 	// read first parameter if present
 	if (!SCPI_ParamBool(context, &chn_enable, TRUE)) {
@@ -217,7 +239,7 @@ static scpi_result_t  PTS_MeasureChannelEnable(scpi_t * context)
 	return SCPI_RES_OK;
 }
 
-static scpi_result_t  PTS_MeasureEnable(scpi_t * context)
+static scpi_result_t  PTS_ConfigureEnable(scpi_t * context)
 {
 	int ret = 0;
 	scpi_bool_t meas_enable;
@@ -245,12 +267,12 @@ static scpi_result_t  PTS_MeasureEnable(scpi_t * context)
 	}
 }
 
-static scpi_result_t  PTS_MeasureResistance(scpi_t * context)
+static scpi_result_t  PTS_ConfigureResistance(scpi_t * context)
 {
 	return SCPI_RES_OK;
 }
 
-static scpi_result_t  PTS_MeasureFrequency(scpi_t * context)
+static scpi_result_t  PTS_ConfigureFrequency(scpi_t * context)
 {
 	int ret = 0;
 	unsigned int period;
@@ -271,7 +293,7 @@ static scpi_result_t  PTS_MeasureFrequency(scpi_t * context)
 	}
 
 	period = (unsigned int)((1.0 / freq_t.value) * 1000000000.0);
-	duty_cycle = preiod / 2;
+	duty_cycle = period / 2;
 
 	ret = sprintf(rw_buf, "%u", period);
 	if (ret > 0) {
@@ -300,7 +322,12 @@ static scpi_result_t  PTS_MeasureFrequency(scpi_t * context)
 	}
 }
 
-static scpi_result_t  PTS_MeasurePeriod(scpi_t * context)
+/**
+ * [PTS_ConfigurePeriod description]
+ * @param  context [description]
+ * @return         [description]
+ */
+static scpi_result_t  PTS_ConfigurePeriod(scpi_t * context)
 {
 	int ret = 0;
 	unsigned int period;
@@ -308,39 +335,53 @@ static scpi_result_t  PTS_MeasurePeriod(scpi_t * context)
 	scpi_number_t period_t;
 	// read first parameter if present
 	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &period_t, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 	if (period_t.value <= 0.0) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
+
 	if (period_t.unit == 6) {
-		preiod = (unsigned int)period_t.value * 1000000000.0;
+		period = (unsigned int)(period_t.value * 1000000000.0);
 	}
 	else {
-		preiod = (unsigned int)period_t.value;
+		period = (unsigned int)period_t.value;
 	}
-
+	SCPI_DBG("set period = %d.\n", period);
 	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
 	if (!pwm_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", PWM_NAME);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	ret = sprintf(rw_buf, "%u", period);
 	if (ret > 0) {
 		ret = iioc_write_attr(pwm_dev, PWM_ATTR_PERIOD, rw_buf);
-		if (ret) {
+		if (ret <= 0) {
+			SCPI_DBG("IIOC: write attr %s error, return %d.\n", PWM_ATTR_PERIOD, ret);
+			write_resp.error = VXI_IO_ERROR;
 			return SCPI_RES_ERR;
 		}
 		else {
+			write_resp.error = VXI_NO_ERROR;
 			return SCPI_RES_OK;
 		}
 	}
 	else {
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 }
 
-static scpi_result_t  PTS_MeasureDutyCycle(scpi_t * context)
+/**
+ * [PTS_ConfigureDutyCycle description]
+ * @param  context [description]
+ * @return         [description]
+ */
+static scpi_result_t  PTS_ConfigureDutyCycle(scpi_t * context)
 {
 	int ret = 0;
 	unsigned int duty_cycle;
@@ -348,42 +389,51 @@ static scpi_result_t  PTS_MeasureDutyCycle(scpi_t * context)
 	scpi_number_t duty_cycle_t;
 	// read first parameter if present
 	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &duty_cycle_t, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
 	if (duty_cycle_t.value <= 0.0) {
 		return SCPI_RES_ERR;
 	}
 	if (duty_cycle_t.unit == 6) {
-		preiod = (unsigned int)duty_cycle_t.value * 1000000000.0;
+		duty_cycle = (unsigned int)(duty_cycle_t.value * 1000000000.0);
 	}
 	else {
-		preiod = (unsigned int)duty_cycle_t.value;
+		duty_cycle = (unsigned int)duty_cycle_t.value;
 	}
+	SCPI_DBG("set duty_cycle = %d.\n", duty_cycle);
 
 	struct iio_device *pwm_dev = iio_context_find_device(ctx_info->ctx, PWM_NAME);
 	if (!pwm_dev) {
+		SCPI_DBG("IIOC: write attr %s error, return %d.\n", PWM_ATTR_DUTY_CYCLE, ret);
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 
 	ret = sprintf(rw_buf, "%u", duty_cycle);
 	if (ret > 0) {
 		ret = iioc_write_attr(pwm_dev, PWM_ATTR_DUTY_CYCLE, rw_buf);
-		if (ret) {
+		if (ret <= 0) {
+			SCPI_DBG("IIOC: write attr %s error, return %d.\n", PWM_ATTR_DUTY_CYCLE, ret);
+			write_resp.error = VXI_IO_ERROR;
 			return SCPI_RES_ERR;
 		}
 		else {
+			write_resp.error = VXI_NO_ERROR;
 			return SCPI_RES_OK;
 		}
 	}
 	else {
+		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
 }
 
 static scpi_result_t  PTS_BufferClear(scpi_t * context)
 {
-	resp_data.error = VXI_NO_ERROR;
-	resp_data.data.data_len = 0;
+	read_resp.error = VXI_NO_ERROR;
+	read_resp.data.data_len = 0;
+	write_resp.error = VXI_NO_ERROR;
 	return SCPI_RES_OK;
 }
 
@@ -450,9 +500,9 @@ static scpi_result_t  PTS_BufferFetchQ(scpi_t * context)
 		return SCPI_RES_ERR;
 	}
 
-	memcpy((char *)resp_data.data.data_val, (char *)chn_info->data_ref, chn_info->offset * 2);
-	resp_data.error = VXI_NO_ERROR;
-	resp_data.data.data_len = chn_info->offset * 2;
+	memcpy((char *)read_resp.data.data_val, (char *)chn_info->data_ref, chn_info->offset * 2);
+	read_resp.error = VXI_NO_ERROR;
+	read_resp.data.data_len = chn_info->offset * 2;
 	return SCPI_RES_OK;
 }
 
@@ -587,12 +637,12 @@ static const scpi_command_t scpi_commands[] = {
 	{.pattern = "MEASure:PERiod?", .callback = PTS_MeasurePeriodQ,},
 	{.pattern = "MEASure:DCYCle?", .callback = PTS_MeasureDutyCycleQ,},
 
-	{.pattern = "CONFigure:CHANnel#:ENABle", .callback = PTS_MeasureChannelEnable,},
-	{.pattern = "CONFigure:ENABle", .callback = PTS_MeasureEnable,},
-	{.pattern = "CONFigure:RESistance", .callback = PTS_MeasureResistance,},
-	{.pattern = "CONFigure:FREQuency", .callback = PTS_MeasureFrequency,},
-	{.pattern = "CONFigure:PERiod", .callback = PTS_MeasurePeriod,},
-	{.pattern = "CONFigure:DCYCle", .callback = PTS_MeasureDutyCycle,},
+	{.pattern = "CONFigure:CHANnel#:ENABle", .callback = PTS_ConfigureChannelEnable,},
+	{.pattern = "CONFigure:ENABle", .callback = PTS_ConfigureEnable,},
+	{.pattern = "CONFigure:RESistance", .callback = PTS_ConfigureResistance,},
+	{.pattern = "CONFigure:FREQuency", .callback = PTS_ConfigureFrequency,},
+	{.pattern = "CONFigure:PERiod", .callback = PTS_ConfigurePeriod,},
+	{.pattern = "CONFigure:DCYCle", .callback = PTS_ConfigureDutyCycle,},
 
 	{.pattern = "BUFFer:CLEar", .callback = PTS_BufferClear,},
 	{.pattern = "BUFFer:SSETup", .callback = PTS_BufferSamplingSetup,},

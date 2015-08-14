@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#define _DEBUG
-#ifdef _DEBUG
+#define IIOC_DEBUG
+#ifdef IIOC_DEBUG
 #define IIOC_DBG(format,...) printf(format, ##__VA_ARGS__)
 #else
 #define IIOC_DBG(format,...)

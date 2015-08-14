@@ -26,7 +26,7 @@ struct Device_Inst {
 typedef struct Device_Inst Device_Inst;
 
 Device_ReadResp read_resp;
-
+Device_WriteResp write_resp;
 char vxi11_buffer[RESP_DATA_BUF_SIZE];
 
 // === iio struct ===
@@ -160,7 +160,7 @@ create_link_1_svc(Create_LinkParms *argp, struct svc_req *rqstp)
 	static Create_LinkResp  result;
 	static pt = 0;
 	int DevIdx;
-	VXI11_SVC_DEBUG("create_link_1_svc: clientId:%d,lockDevice:%d,lock_timeout:%d,device:%s.\n", argp->clientId, argp->lockDevice, argp->lock_timeout, argp->device);
+	VXI11_SVC_DEBUG("create_link_1_svc: clientId:%ld,lockDevice:%d,lock_timeout:%d,device:%s.\n", argp->clientId, argp->lockDevice, argp->lock_timeout, argp->device);
 
 	DevIdx = pairDeviceByName(argp->device);
 	if (DevIdx >= 0)
@@ -199,18 +199,18 @@ create_link_1_svc(Create_LinkParms *argp, struct svc_req *rqstp)
 		}
 	}
 
-	if (!resp_data.data.data_val) {
-		resp_data.reason = 0x04;
-		resp_data.error = VXI_IO_ERROR;
-		resp_data.data.data_len = 0;
-		resp_data.data.data_val = vxi11_buffer;
+	if (!read_resp.data.data_val) {
+		read_resp.reason = 0x04;
+		read_resp.error = VXI_IO_ERROR;
+		read_resp.data.data_len = 0;
+		read_resp.data.data_val = vxi11_buffer;
 	}
 
 	// malloc data buffer memory
-	// if (!resp_data.data) {
-	// 	resp_data.len = 0;
-	// 	resp_data.data = (char *)malloc(RESP_DATA_BUF_SIZE, sizeof(char));
-	// 	if (!resp_data.data) {
+	// if (!read_resp.data) {
+	// 	read_resp.len = 0;
+	// 	read_resp.data = (char *)malloc(RESP_DATA_BUF_SIZE, sizeof(char));
+	// 	if (!read_resp.data) {
 	// 		VXI11_SVC_DEBUG("malloc resp data buffer memory error.\n");
 	// 		result.error = VXI_DEV_NOT_ACCESS;
 	// 		return &result;
@@ -227,7 +227,7 @@ create_link_1_svc(Create_LinkParms *argp, struct svc_req *rqstp)
 	result.lid = dInst[DevIdx].lid;
 	result.abortPort = 0;
 	result.maxRecvSize = MAX_RECV_SIZE;
-	VXI11_SVC_DEBUG("CreateLink Result: error:%d,lid:%d,abortPort:%d,maxRecvSize:%d.\n", result.error, result.lid, result.abortPort, result.maxRecvSize);
+	VXI11_SVC_DEBUG("CreateLink Result: error:%d,lid:%ld,abortPort:%d,maxRecvSize:%d.\n", result.error, result.lid, result.abortPort, result.maxRecvSize);
 	return &result;
 }
 
@@ -235,8 +235,8 @@ Device_WriteResp *
 device_write_1_svc(Device_WriteParms *argp, struct svc_req *rqstp)
 {
 	static Device_WriteResp  result;
-	int DevIdx;
-	VXI11_SVC_DEBUG("device_write_1_svc: Device_Link:%d,io_timeout:%d,lock_timeout:%d,flags:%d,data_len:%d.\n",
+	int ret, DevIdx;
+	VXI11_SVC_DEBUG("device_write_1_svc: Device_Link:%ld,io_timeout:%d,lock_timeout:%d,flags:%d,data_len:%d.\n",
 	                argp->lid, argp->io_timeout, argp->lock_timeout, argp->flags, argp->data.data_len);
 
 	//check lid
@@ -253,18 +253,21 @@ device_write_1_svc(Device_WriteParms *argp, struct svc_req *rqstp)
 		return &result;
 	}
 
-	if (strncmp(argp->data.data_val, "*IDN?", 5) == 0 || strncmp(argp->data.data_val, "*idn?", 5) == 0 )
+	SCPI_Init(&scpi_context);
+	VXI11_SVC_DEBUG("Receive: %s.\n", argp->data.data_val);
+	ret = SCPI_Input(&scpi_context, argp->data.data_val, argp->data.data_len);
+	VXI11_SVC_DEBUG("SCPI_Input return %d.\n", ret);
+	if (ret > 0)
 	{
-		VXI11_SVC_DEBUG("Receive: %s.\n", argp->data.data_val);
+		result.error = write_resp.error;
+		result.size = argp->data.data_len;
+		return &result;
 	}
 	else
 	{
 		result.error = VXI_PARAM_ERROR;
 		return &result;
 	}
-	result.error = VXI_NO_ERROR;
-	result.size = argp->data.data_len;
-	return &result;
 }
 
 Device_ReadResp *
@@ -282,9 +285,9 @@ device_read_1_svc(Device_ReadParms *argp, struct svc_req *rqstp)
 		return &result;
 	}
 	result.reason = 0x04;
-	result.error = VXI_NO_ERROR;
-	result.data.data_len = strlen(dInst[DevIdx].info);
-	result.data.data_val = dInst[DevIdx].info;
+	result.error = read_resp.error;
+	result.data.data_len = read_resp.data.data_len;
+	result.data.data_val = read_resp.data.data_val;
 	return &result;
 }
 

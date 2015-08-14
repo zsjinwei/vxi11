@@ -128,8 +128,7 @@ int iioc_read_attr(struct iio_device *dev, const char *attr_name, char *attr_val
 		return -EINVAL;
 	}
 
-	ret = (char *)iio_device_attr_read(dev, attr_name, attr_val, 30);
-	return 0;
+	return iio_device_attr_read(dev, attr_name, attr_val, 30);
 }
 
 int iioc_write_attr(struct iio_device *dev, const char *attr_name, const char *attr_val)
@@ -145,8 +144,7 @@ int iioc_write_attr(struct iio_device *dev, const char *attr_name, const char *a
 		return -EINVAL;
 	}
 
-	ret = (char *)iio_device_attr_write(dev, attr_name, attr_val);
-	return 0;
+	return iio_device_attr_write(dev, attr_name, attr_val);
 }
 
 int iioc_sampling_setup(struct iio_device *adc_dev,

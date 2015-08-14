@@ -6,6 +6,13 @@
 #include <string.h>
 #include "scpi/scpi.h"
 
+#define SCPI_DEBUG
+#ifdef SCPI_DEBUG
+#define SCPI_DBG(format,...) fprintf(stderr, format, ##__VA_ARGS__)
+#else
+#define SCPI_DBG(format,...)
+#endif
+
 extern scpi_t scpi_context;
 
 size_t SCPI_Write(scpi_t * context, const char * data, size_t len);
