@@ -202,7 +202,7 @@ int iioc_sampling_setup(struct iio_device *adc_dev,
 
 		if (chn_info->data_ref)
 			free(chn_info->data_ref);
-		chn_info->data_ref = (short *)calloc(dev_info->sample_count, sizeof(short));
+		chn_info->data_ref = (int16_t *)calloc(dev_info->sample_count, sizeof(int16_t));
 		if (!chn_info->data_ref) {
 			IIOC_DBG("Can not calloc channel data mem.\n");
 			goto error_calloc_chn_data_ref;
@@ -446,25 +446,25 @@ static ssize_t demux_sample(const struct iio_channel *chn,
 		int8_t val;
 		iio_channel_convert(chn, &val, sample);
 		if (format->is_signed)
-			*(chn_info->data_ref + chn_info->offset++) = (short)val;
+			*(chn_info->data_ref + chn_info->offset++) = (int8_t)val;
 		else
-			*(chn_info->data_ref + chn_info->offset++) = (short)(uint8_t)val;
+			*(chn_info->data_ref + chn_info->offset++) = (uint8_t)val;
 	}
 	else if (size == 2) {
 		int16_t val;
 		iio_channel_convert(chn, &val, sample);
 		if (format->is_signed)
-			*(chn_info->data_ref + chn_info->offset++) = (short)val;
+			*(chn_info->data_ref + chn_info->offset++) = (int16_t)val;
 		else
-			*(chn_info->data_ref + chn_info->offset++) = (short)(uint16_t)val;
+			*(chn_info->data_ref + chn_info->offset++) = (uint16_t)val;
 	}
 	else {
 		int32_t val;
 		iio_channel_convert(chn, &val, sample);
 		if (format->is_signed)
-			*(chn_info->data_ref + chn_info->offset++) = (short)val;
+			*(chn_info->data_ref + chn_info->offset++) = (int32_t)val;
 		else
-			*(chn_info->data_ref + chn_info->offset++) = (short)(uint32_t)val;
+			*(chn_info->data_ref + chn_info->offset++) = (uint32_t)val;
 	}
 
 	return size;

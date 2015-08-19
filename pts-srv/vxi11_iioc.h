@@ -67,7 +67,7 @@ struct extra_ctx_info {
 
 struct extra_chn_info {
 	struct iio_device *dev; //°ó¶¨µÄiio_device
-	short *data_ref;//Í¨µÀÊý¾Ý´æ´¢¿Õ¼äµØÖ·
+	int16_t *data_ref;//Í¨µÀÊý¾Ý´æ´¢¿Õ¼äµØÖ·
 	off_t offset;//Í¨µÀÊý¾Ý´æ´¢¿Õ¼äÆ«ÒÆ
 	bool enabled; //ÊÇ·ñÊ¹ÄÜ
 };

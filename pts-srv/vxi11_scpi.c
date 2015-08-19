@@ -48,6 +48,29 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
 	return SCPI_RES_OK;
 }
 
+static scpi_result_t  PTS_IdnQ(scpi_t * context)
+{
+	int i;
+	int offset = 0;
+	for (i = 0; i < 4; i++) {
+		if (context->idn[i]) {
+			strcpy(read_resp.data.data_val + offset, context->idn[i]);
+			offset += strlen(context->idn[i]);
+		} else {
+			strcpy(read_resp.data.data_val + offset, "0");
+			offset += 1;
+		}
+		if (i != 3) {
+			strcpy(read_resp.data.data_val + offset, ",");
+			offset += 1;
+		}
+	}
+	read_resp.error = VXI_NO_ERROR;
+	read_resp.data.data_len = offset + 1;
+	write_resp.error = VXI_NO_ERROR;
+	return SCPI_RES_OK;
+}
+
 /**
  * [PTS_MeasureChannelEnableQ description]
  * @param  context [description]
@@ -561,7 +584,7 @@ static scpi_result_t  PTS_BufferSamplingCapture(scpi_t * context)
 		write_resp.error = VXI_IO_ERROR;
 		return SCPI_RES_ERR;
 	}
-	SCPI_DBG("Samplint start.\n");
+	SCPI_DBG("Sampling start.\n");
 	ret = iioc_sampling_capture(adc_dev);
 	if (ret) {
 		write_resp.error = VXI_IO_ERROR;
@@ -708,7 +731,7 @@ static const scpi_command_t scpi_commands[] = {
 	{ .pattern = "*ESE", .callback = SCPI_CoreEse,},
 	{ .pattern = "*ESE?", .callback = SCPI_CoreEseQ,},
 	{ .pattern = "*ESR?", .callback = SCPI_CoreEsrQ,},
-	{ .pattern = "*IDN?", .callback = SCPI_CoreIdnQ,},
+	{ .pattern = "*IDN?", .callback = PTS_IdnQ,},
 	{ .pattern = "*OPC", .callback = SCPI_CoreOpc,},
 	{ .pattern = "*OPC?", .callback = SCPI_CoreOpcQ,},
 	{ .pattern = "*RST", .callback = SCPI_CoreRst,},
