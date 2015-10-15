@@ -367,6 +367,7 @@ static scpi_result_t  PTS_ConfigureFrequency(scpi_t * context)
 	unsigned int duty_cycle;
 	char rw_buf[30];
 	scpi_number_t freq_t;
+	// 748159
 	// read first parameter if present
 	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &freq_t, TRUE)) {
 		write_resp.error = VXI_PARAM_ERROR;
@@ -635,8 +636,209 @@ static scpi_result_t  PTS_BufferFetchQ(scpi_t * context)
 	write_resp.error = VXI_NO_ERROR;
 	return SCPI_RES_OK;
 }
+/*
+static scpi_result_t  PTS_MeasureDDSOSKEnableQ(scpi_t * context) {
+	int ret = 0;
+	struct iio_device *dds_dev = iio_context_find_device(ctx_info->ctx, DDS_NAME);
+	if (!dds_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", DDS_NAME);
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
 
+	ret = iioc_read_attr(dds_dev, DDS_ATTR_OSK_EN, read_resp.data.data_val);
+	if (ret > 0) {
+		read_resp.error = VXI_NO_ERROR;
+		read_resp.data.data_len = ret;
+		write_resp.error = VXI_NO_ERROR;
+		return SCPI_RES_OK;
+	}
+	else {
+		SCPI_DBG("IIOC: read attr %s error, return %d.\n", DDS_ATTR_OSK_EN, ret);
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+}
+*/
+static scpi_result_t  PTS_MeasureDDSynthesizerFrequencyQ(scpi_t * context) {
+	int ret = 0;
+	struct iio_device *dds_dev = iio_context_find_device(ctx_info->ctx, DDS_NAME);
+	struct iio_channel *dds_chn0;
+	if (!dds_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", DDS_NAME);
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
+	dds_chn0 = iio_device_get_channel(dds_dev, 0);
 
+	ret = iio_channel_attr_read(dds_chn0, DDS_ATTR_FREQ, read_resp.data.data_val, 20);
+	if (ret > 0) {
+		read_resp.error = VXI_NO_ERROR;
+		read_resp.data.data_len = ret;
+		write_resp.error = VXI_NO_ERROR;
+		return SCPI_RES_OK;
+	}
+	else {
+		SCPI_DBG("IIOC: read attr %s error, return %d.\n", DDS_ATTR_FREQ, ret);
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_MeasureDDSynthesizerAmplitudeQ(scpi_t * context) {
+	int ret = 0;
+	struct iio_device *dds_dev = iio_context_find_device(ctx_info->ctx, DDS_NAME);
+	struct iio_channel *dds_chn0;
+	if (!dds_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", DDS_NAME);
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
+	dds_chn0 = iio_device_get_channel(dds_dev, 0);
+
+	ret = iio_channel_attr_read(dds_chn0, DDS_ATTR_AMP, read_resp.data.data_val, 20);
+	if (ret > 0) {
+		read_resp.error = VXI_NO_ERROR;
+		read_resp.data.data_len = ret;
+		write_resp.error = VXI_NO_ERROR;
+		return SCPI_RES_OK;
+	}
+	else {
+		SCPI_DBG("IIOC: read attr %s error, return %d.\n", DDS_ATTR_AMP, ret);
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_ConfigureDDSynthesizerOSKEnable(scpi_t * context) {
+	int ret = 0;
+	scpi_bool_t conf_enable;
+	struct iio_channel *dds_chn0;
+	// read first parameter if present
+	if (!SCPI_ParamBool(context, &conf_enable, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
+
+	struct iio_device *dds_dev = iio_context_find_device(ctx_info->ctx, DDS_NAME);
+	if (!dds_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", DDS_NAME);
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+
+	dds_chn0 = iio_device_get_channel(dds_dev, 0);
+
+	if (conf_enable) {
+		ret = iio_channel_attr_write(dds_chn0, DDS_ATTR_OSK_EN, "1");
+	}
+	else {
+		ret = iio_channel_attr_write(dds_chn0, DDS_ATTR_OSK_EN, "0");
+	}
+	if (ret > 0) {
+		write_resp.error = VXI_NO_ERROR;
+		return SCPI_RES_OK;
+	}
+	else {
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_ConfigureDDSynthesizerFrequency(scpi_t * context) {
+	int ret = 0;
+	unsigned int frequency;
+	char rw_buf[30];
+	scpi_number_t frequency_t;
+	struct iio_channel *dds_chn0;
+	// read first parameter if present
+	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &frequency_t, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
+	if (frequency_t.value <= 0.0) {
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
+
+	if (frequency_t.unit == 6) {
+		frequency = (unsigned int)(frequency_t.value * 1000000000.0);
+	}
+	else {
+		frequency = (unsigned int)frequency_t.value;
+	}
+	SCPI_DBG("set dds frequency = %d.\n", frequency);
+	struct iio_device *dds_dev = iio_context_find_device(ctx_info->ctx, DDS_NAME);
+	if (!dds_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", DDS_NAME);
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+	dds_chn0 = iio_device_get_channel(dds_dev, 0);
+
+	ret = sprintf(rw_buf, "%u", frequency);
+	if (ret > 0) {
+		ret = iio_channel_attr_write(dds_chn0, DDS_ATTR_FREQ, rw_buf);
+		if (ret <= 0) {
+			SCPI_DBG("IIOC: write attr %s error, return %d.\n", DDS_ATTR_FREQ, ret);
+			write_resp.error = VXI_IO_ERROR;
+			return SCPI_RES_ERR;
+		}
+		else {
+			write_resp.error = VXI_NO_ERROR;
+			return SCPI_RES_OK;
+		}
+	}
+	else {
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+}
+
+static scpi_result_t  PTS_ConfigureDDSynthesizerAmplitude(scpi_t * context) {
+	int ret = 0;
+	unsigned int amp_set_val;
+	char rw_buf[30];
+	scpi_number_t amplitude_t;
+	struct iio_channel *dds_chn0;
+	// read first parameter if present
+	if (!SCPI_ParamNumber(context, scpi_special_numbers_def, &amplitude_t, TRUE)) {
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
+	if (amplitude_t.value < 0.0 || amplitude_t.value > 1.0) {
+		write_resp.error = VXI_PARAM_ERROR;
+		return SCPI_RES_ERR;
+	}
+	amp_set_val = (unsigned int)(amplitude_t.value * 4095.0);
+
+	SCPI_DBG("set dds amplitude = %d.\n", amp_set_val);
+	struct iio_device *dds_dev = iio_context_find_device(ctx_info->ctx, DDS_NAME);
+	if (!dds_dev) {
+		SCPI_DBG("IIOC: cannot find %s.\n", DDS_NAME);
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+	dds_chn0 = iio_device_get_channel(dds_dev, 0);
+
+	ret = sprintf(rw_buf, "%u", amp_set_val);
+	if (ret > 0) {
+		ret = iio_channel_attr_write(dds_chn0, DDS_ATTR_AMP, rw_buf);
+		if (ret <= 0) {
+			SCPI_DBG("IIOC: write attr %s error, return %d.\n", DDS_ATTR_FREQ, ret);
+			write_resp.error = VXI_IO_ERROR;
+			return SCPI_RES_ERR;
+		}
+		else {
+			write_resp.error = VXI_NO_ERROR;
+			return SCPI_RES_OK;
+		}
+	}
+	else {
+		write_resp.error = VXI_IO_ERROR;
+		return SCPI_RES_ERR;
+	}
+}
 
 static scpi_result_t TEST_Bool(scpi_t * context) {
 	scpi_bool_t param1;
@@ -766,6 +968,8 @@ static const scpi_command_t scpi_commands[] = {
 	{.pattern = "MEASure:FREQuency?", .callback = PTS_MeasureFrequencyQ,},
 	{.pattern = "MEASure:PERiod?", .callback = PTS_MeasurePeriodQ,},
 	{.pattern = "MEASure:DCYCle?", .callback = PTS_MeasureDutyCycleQ,},
+	{.pattern = "MEASure:DDSYnthesizer:FREQuency?", .callback = PTS_MeasureDDSynthesizerFrequencyQ,},
+	{.pattern = "MEASure:DDSYnthesizer:AMPLitude?", .callback = PTS_MeasureDDSynthesizerAmplitudeQ,},
 
 	{.pattern = "CONFigure:CHANnel#:ENABle", .callback = PTS_ConfigureChannelEnable,},
 	{.pattern = "CONFigure:ENABle", .callback = PTS_ConfigureEnable,},
@@ -773,6 +977,9 @@ static const scpi_command_t scpi_commands[] = {
 	{.pattern = "CONFigure:FREQuency", .callback = PTS_ConfigureFrequency,},
 	{.pattern = "CONFigure:PERiod", .callback = PTS_ConfigurePeriod,},
 	{.pattern = "CONFigure:DCYCle", .callback = PTS_ConfigureDutyCycle,},
+	{.pattern = "CONFigure:DDSYnthesizer:ENABle", .callback = PTS_ConfigureDDSynthesizerOSKEnable,},
+	{.pattern = "CONFigure:DDSYnthesizer:FREQuency", .callback = PTS_ConfigureDDSynthesizerFrequency,},
+	{.pattern = "CONFigure:DDSYnthesizer:AMPLitude", .callback = PTS_ConfigureDDSynthesizerAmplitude,},
 
 	{.pattern = "BUFFer:CLEar", .callback = PTS_BufferClear,},
 	{.pattern = "BUFFer:SSETup", .callback = PTS_BufferSamplingSetup,},

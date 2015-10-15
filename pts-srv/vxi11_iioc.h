@@ -59,6 +59,10 @@ extern "C" {
 #define PWM_ATTR_PERIOD	"period"
 #define PWM_ATTR_DUTY_CYCLE	"duty_cycle"
 
+#define DDS_ATTR_FREQ	"freq0"
+#define DDS_ATTR_OSK_EN	"ctrl_osk_en"
+#define DDS_ATTR_AMP	"osk_imulti"
+
 struct extra_ctx_info {
 	struct iio_context *ctx;
 	unsigned int nb_devices;
