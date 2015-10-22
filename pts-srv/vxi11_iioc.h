@@ -50,10 +50,9 @@ extern "C" {
 #define TRIGGER_NAME	"irqtrig37"
 #define PWM_NAME		"pwm0"
 #define DDS_NAME		"ad9854"
-#define DPOT0_NAME		"ad5235.0"
-#define DPOT1_NAME		"ad5235.1"
-#define DPOT2_NAME		"ad5235.2"
-#define DPOT3_NAME		"ad5235.3"
+
+#define DPOT_NUM 4
+#define DPOT_NAME		{"ad5242_0","ad5242_1","ad5242_2","ad5242_3"}
 
 #define PWM_ATTR_ENABLE	"enable"
 #define PWM_ATTR_PERIOD	"period"
@@ -62,6 +61,9 @@ extern "C" {
 #define DDS_ATTR_FREQ	"freq0"
 #define DDS_ATTR_OSK_EN	"ctrl_osk_en"
 #define DDS_ATTR_AMP	"osk_imulti"
+
+#define DPOT_ATTR_RDAC0	"rdac0"
+#define DPOT_ATTR_RDAC1	"rdac1"
 
 struct extra_ctx_info {
 	struct iio_context *ctx;
