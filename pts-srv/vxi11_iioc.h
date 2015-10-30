@@ -47,7 +47,7 @@ extern "C" {
 #endif
 
 #define ADC_NAME		"ad7606"
-#define TRIGGER_NAME	"irqtrig37"
+#define TRIGGER_NAME	"irqtrig38"
 #define PWM_NAME		"pwm0"
 #define DDS_NAME		"ad9854"
 

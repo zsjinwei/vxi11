@@ -357,7 +357,7 @@ static scpi_result_t  PTS_ConfigureResistance(scpi_t * context)
 	int dpot_dev_count = 0;
 	unsigned int res;
 	unsigned int dpot_res[DPOT_NUM * 2];
-	struct iio_device dpot_dev[DPOT_NUM];
+	struct iio_device *dpot_dev[DPOT_NUM];
 	const char *dpot_name[DPOT_NUM] = DPOT_NAME;
 	char rw_buf[30];
 	scpi_number_t res_t;
@@ -366,61 +366,62 @@ static scpi_result_t  PTS_ConfigureResistance(scpi_t * context)
 		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
-
-	for (i = 0; i < DPOT_NUM; i++) {
-		dpot_dev[dpot_dev_count] = iio_context_find_device(ctx_info->ctx, dpot_name[i]);
-		if (!dpot_dev[dpot_dev_count]) {
-			SCPI_DBG("IIOC: cannot find %s.\n", dpot_name[i]);
-			write_resp.error = VXI_IO_ERROR;
-			return SCPI_RES_ERR;
-		}
-		dpot_dev_count++;
-	}
-
-	res = (unsigned int)(res_t.value);
-	if (res > 255 * dpot_dev_count * 2) {
-		write_resp.error = VXI_PARAM_ERROR;
-		return SCPI_RES_ERR;
-	}
-
-	for (i = 0; i < DPOT_NUM; i++) {
-		dpot_res[i] = res > (255 * i) ? 255 : res - (255 * i);
-	}
-
-	for (i = 0; i < dpot_dev_count; i++) {
-		SCPI_DBG("write to %s: res_raw=%d.\n", dpot_name[i], dpot_res[i]);
-		ret = sprintf(rw_buf, "%d", dpot_res[i]);
-		if (ret > 0) {
-			ret = iioc_write_attr(dpot_dev[i], DPOT_ATTR_RDAC0, rw_buf);
-			if (ret <= 0) {
+	return SCPI_RES_OK;
+	/*
+		for (i = 0; i < DPOT_NUM; i++) {
+			dpot_dev[dpot_dev_count] = iio_context_find_device(ctx_info->ctx, dpot_name[i]);
+			if (!dpot_dev[dpot_dev_count]) {
+				SCPI_DBG("IIOC: cannot find %s.\n", dpot_name[i]);
 				write_resp.error = VXI_IO_ERROR;
 				return SCPI_RES_ERR;
 			}
-			else {
-				SCPI_DBG("write to %s: res_raw=%d.\n", dpot_name[i], dpot_res[i + 1]);
-				ret = sprintf(rw_buf, "%d", dpot_res[i + 1]);
-				if (ret > 0) {
-					ret = iioc_write_attr(dpot_dev[i + 1], DPOT_ATTR_RDAC1, rw_buf);
-					if (ret <= 0) {
-						write_resp.error = VXI_IO_ERROR;
-						return SCPI_RES_ERR;
-					}
-					else {
-						write_resp.error = VXI_NO_ERROR;
-						return SCPI_RES_OK;
-					}
-				}
-				else {
+			dpot_dev_count++;
+		}
+
+		res = (unsigned int)(res_t.value);
+		if (res > 255 * dpot_dev_count * 2) {
+			write_resp.error = VXI_PARAM_ERROR;
+			return SCPI_RES_ERR;
+		}
+
+		for (i = 0; i < DPOT_NUM; i++) {
+			dpot_res[i] = res > (255 * i) ? 255 : res - (255 * i);
+		}
+
+		for (i = 0; i < dpot_dev_count; i++) {
+			SCPI_DBG("write to %s: res_raw=%d.\n", dpot_name[i], dpot_res[i]);
+			ret = sprintf(rw_buf, "%d", dpot_res[i]);
+			if (ret > 0) {
+				ret = iioc_write_attr(dpot_dev[i], DPOT_ATTR_RDAC0, rw_buf);
+				if (ret <= 0) {
 					write_resp.error = VXI_IO_ERROR;
 					return SCPI_RES_ERR;
 				}
+				else {
+					SCPI_DBG("write to %s: res_raw=%d.\n", dpot_name[i], dpot_res[i + 1]);
+					ret = sprintf(rw_buf, "%d", dpot_res[i + 1]);
+					if (ret > 0) {
+						ret = iioc_write_attr(dpot_dev[i + 1], DPOT_ATTR_RDAC1, rw_buf);
+						if (ret <= 0) {
+							write_resp.error = VXI_IO_ERROR;
+							return SCPI_RES_ERR;
+						}
+						else {
+							write_resp.error = VXI_NO_ERROR;
+							return SCPI_RES_OK;
+						}
+					}
+					else {
+						write_resp.error = VXI_IO_ERROR;
+						return SCPI_RES_ERR;
+					}
+				}
 			}
-		}
-		else {
-			write_resp.error = VXI_IO_ERROR;
-			return SCPI_RES_ERR;
-		}
-	}
+			else {
+				write_resp.error = VXI_IO_ERROR;
+				return SCPI_RES_ERR;
+			}
+		}*/
 }
 
 /**
@@ -877,7 +878,7 @@ static scpi_result_t  PTS_ConfigureDDSynthesizerAmplitude(scpi_t * context) {
 		write_resp.error = VXI_PARAM_ERROR;
 		return SCPI_RES_ERR;
 	}
-	amp_set_val = (unsigned int)(amplitude_t.value * 4095.0);
+	amp_set_val = (unsigned int)(amplitude_t.value * 4095.0 + 0.5);
 
 	SCPI_DBG("set dds amplitude = %d.\n", amp_set_val);
 	struct iio_device *dds_dev = iio_context_find_device(ctx_info->ctx, DDS_NAME);
